@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
  * Questi metodi mirano a sostituire writeUTF/readUTF della classe DataOutputStream/DataInputStream
  * che utilizzano un encoding UTF-8 modificato, proprio di java, che rende molto difficile 
  * l'interfacciamento con altri linguaggi di programmazione.
- * Fonte: https://docs.oracle.com/javase/7/docs/api/java/io/DataOutputStream.html#writeUTF(java.lang.String)
+ * Fonte: <a href="https://docs.oracle.com/javase/7/docs/api/java/io/DataOutputStream.html#writeUTF">https://docs.oracle.com/javase/7/docs/api/java/io/DataOutputStream.html#writeUTF</a>(java.lang.String)
  *  
  * Per questo motivo, i metodi writeString/readString realizzano un approccio analogo a quello di
  * writeUTF/readUTF ma utilizzando un encoding UTF-8 standard.

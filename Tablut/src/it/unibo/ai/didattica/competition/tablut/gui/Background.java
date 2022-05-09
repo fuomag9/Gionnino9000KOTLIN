@@ -2,6 +2,7 @@ package it.unibo.ai.didattica.competition.tablut.gui;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.io.Serial;
 
 import javax.swing.JFrame;
 
@@ -12,7 +13,8 @@ public abstract class Background extends JFrame {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 	
 	protected Image background;
 	protected Image black;

@@ -3,6 +3,7 @@ package it.unibo.ai.didattica.competition.tablut.domain;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Abstract class for a State of a game We have a representation of the board
@@ -23,12 +24,12 @@ public abstract class State {
 		WHITE("W"), BLACK("B"), WHITEWIN("WW"), BLACKWIN("BW"), DRAW("D");
 		private final String turn;
 
-		private Turn(String s) {
+		Turn(String s) {
 			turn = s;
 		}
 
 		public boolean equalsTurn(String otherName) {
-			return (otherName == null) ? false : turn.equals(otherName);
+			return otherName != null && turn.equals(otherName);
 		}
 
 		public String toString() {
@@ -47,12 +48,12 @@ public abstract class State {
 		EMPTY("O"), WHITE("W"), BLACK("B"), THRONE("T"), KING("K");
 		private final String pawn;
 
-		private Pawn(String s) {
+		Pawn(String s) {
 			pawn = s;
 		}
 
 		public boolean equalsPawn(String otherPawn) {
-			return (otherPawn == null) ? false : pawn.equals(otherPawn);
+			return otherPawn != null && pawn.equals(otherPawn);
 		}
 
 		public String toString() {
@@ -61,7 +62,7 @@ public abstract class State {
 
 	}
 
-	protected Pawn board[][];
+	protected Pawn[][] board;
 	protected Turn turn;
 
 	public State() {
@@ -73,10 +74,10 @@ public abstract class State {
 	}
 
 	public String boardString() {
-		StringBuffer result = new StringBuffer();
-		for (int i = 0; i < this.board.length; i++) {
+		StringBuilder result = new StringBuilder();
+		for (Pawn[] pawns : this.board) {
 			for (int j = 0; j < this.board.length; j++) {
-				result.append(this.board[i][j].toString());
+				result.append(pawns[j].toString());
 				if (j == 8) {
 					result.append("\n");
 				}
@@ -87,30 +88,25 @@ public abstract class State {
 
 	@Override
 	public String toString() {
-		StringBuffer result = new StringBuffer();
 
 		// board
-		result.append("");
-		result.append(this.boardString());
 
-		result.append("-");
-		result.append("\n");
+		return "" +
+				this.boardString() +
+				"-" +
+				"\n" +
 
-		// TURNO
-		result.append(this.turn.toString());
-
-		return result.toString();
+				// TURNO
+				this.turn.toString();
 	}
 
 	public String toLinearString() {
-		StringBuffer result = new StringBuffer();
 
 		// board
-		result.append("");
-		result.append(this.boardString().replace("\n", ""));
-		result.append(this.turn.toString());
 
-		return result.toString();
+		return "" +
+				this.boardString().replace("\n", "") +
+				this.turn.toString();
 	}
 
 	/**
@@ -175,16 +171,14 @@ public abstract class State {
 					if (!this.board[i][j].equals(other.board[i][j]))
 						return false;
 		}
-		if (this.turn != other.turn)
-			return false;
-		return true;
+		return this.turn == other.turn;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.board == null) ? 0 : this.board.hashCode());
+		result = prime * result + ((this.board == null) ? 0 : Arrays.deepHashCode(this.board));
 		result = prime * result + ((this.turn == null) ? 0 : this.turn.hashCode());
 		return result;
 	}
@@ -196,25 +190,24 @@ public abstract class State {
 		return ret;
 	}
 
-	public State clone() {
+	public State clone() throws CloneNotSupportedException {
+		State state = (State) super.clone();
 		Class<? extends State> stateclass = this.getClass();
-		Constructor<? extends State> cons = null;
+		Constructor<? extends State> cons;
 		State result = null;
 		try {
 			cons = stateclass.getConstructor(stateclass);
-			result = cons.newInstance(new Object[0]);
+			result = cons.newInstance();
 		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 
-		Pawn oldboard[][] = this.getBoard();
-		Pawn newboard[][] = result.getBoard();
+		Pawn[][] oldboard = this.getBoard();
+		Pawn[][] newboard = Objects.requireNonNull(result).getBoard();
 
 		for (int i = 0; i < this.board.length; i++) {
-			for (int j = 0; j < this.board[i].length; j++) {
-				newboard[i][j] = oldboard[i][j];
-			}
+			System.arraycopy(oldboard[i], 0, newboard[i], 0, this.board[i].length);
 		}
 
 		result.setBoard(newboard);
@@ -229,9 +222,9 @@ public abstract class State {
 	 */
 	public int getNumberOf(Pawn color) {
 		int count = 0;
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board[i].length; j++) {
-				if (board[i][j] == color)
+		for (Pawn[] pawns : board) {
+			for (Pawn pawn : pawns) {
+				if (pawn == color)
 					count++;
 			}
 		}

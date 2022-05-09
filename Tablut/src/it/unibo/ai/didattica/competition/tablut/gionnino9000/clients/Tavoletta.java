@@ -6,7 +6,6 @@ import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.gionnino9000.search.TavolettaSearch;
-import it.unibo.ai.didattica.competition.tablut.gionnino9000.search.TavolettaMCTS;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -28,8 +27,8 @@ public class Tavoletta extends TablutClient {
     public static final String TEAM_NAME = "Gionnino9000";
     public static final String PLAYER_NAME = "Tavoletta";
 
-    private int game;
-    private boolean debug;
+    private final int game;
+    private final boolean debug;
 
     /**
      * Main constructor
@@ -63,8 +62,10 @@ public class Tavoletta extends TablutClient {
         boolean deb = false;
 
         if(args.length < 1) {
-            System.out.printf("ERROR: You must specify which player you are [WHITE | BLACK]\n" +
-                    "\tUSAGE: ./runmyplayer <black|white> <timeout-in-seconds> <server-ip> <debug>\n");
+            System.out.print("""
+                    ERROR: You must specify which player you are [WHITE | BLACK]
+                    \tUSAGE: ./runmyplayer <black|white> <timeout-in-seconds> <server-ip> <debug>
+                    """);
             System.exit(1);
         } else {
             role = (args[0]);
@@ -75,8 +76,10 @@ public class Tavoletta extends TablutClient {
                 timeout = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-                System.out.printf("ERROR: Timeout must be an integer representing seconds\n" +
-                        "\tUSAGE: ./runmyplayer <black|white> <timeout-in-seconds> <server-ip> <debug>\n");
+                System.out.print("""
+                        ERROR: Timeout must be an integer representing seconds
+                        \tUSAGE: ./runmyplayer <black|white> <timeout-in-seconds> <server-ip> <debug>
+                        """);
                 System.exit(1);
             }
         }
@@ -87,8 +90,10 @@ public class Tavoletta extends TablutClient {
                 ip = args[2];
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-                System.out.printf("ERROR: Timeout must be an integer representing seconds\n" +
-                        "\tUSAGE: ./runmyplayer <black|white> <timeout-in-seconds> <server-ip> <debug>\n");
+                System.out.print("""
+                        ERROR: Timeout must be an integer representing seconds
+                        \tUSAGE: ./runmyplayer <black|white> <timeout-in-seconds> <server-ip> <debug>
+                        """);
                 System.exit(1);
             }
         }
@@ -99,15 +104,17 @@ public class Tavoletta extends TablutClient {
                 ip = args[2];
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-                System.out.printf("ERROR: Timeout must be an integer representing seconds\n" +
-                        "\tUSAGE: ./runmyplayer <black|white> <timeout-in-seconds> <server-ip> <debug>\n");
+                System.out.print("""
+                        ERROR: Timeout must be an integer representing seconds
+                        \tUSAGE: ./runmyplayer <black|white> <timeout-in-seconds> <server-ip> <debug>
+                        """);
                 System.exit(1);
             }
 
             if(args[3].equals("debug")) {
                 deb = true;
             } else {
-                System.out.printf("ERROR: The last argument can be only 'debug' and it allow to print logs during search\n" +
+                System.out.print("ERROR: The last argument can be only 'debug' and it allow to print logs during search\n" +
                         "\tUSAGE: ./runmyplayer <black|white> <timeout-in-seconds> <server-ip> <debug>");
                 System.exit(1);
             }
@@ -143,7 +150,7 @@ public class Tavoletta extends TablutClient {
             try {
                 // Receive the state from the Server
                 this.read();
-            } catch (ClassNotFoundException | IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(2);
             }
@@ -166,7 +173,7 @@ public class Tavoletta extends TablutClient {
 
                     try {
                         this.write(a);
-                    } catch (ClassNotFoundException | IOException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
 
@@ -199,7 +206,7 @@ public class Tavoletta extends TablutClient {
 
                     try {
                         this.write(a);
-                    } catch (ClassNotFoundException | IOException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
 
@@ -277,49 +284,50 @@ public class Tavoletta extends TablutClient {
         else
         {
             System.out.println(
-                    "                                       .^?5GGPJJJ?777!~:          \n" +
-                    "                                 .^7Y5P#&#BBGGGGPPPG&@@&?         \n" +
-                    "                            .:~JPB@@@&B5?!?Y5PPGG5YYJ?!&5         \n" +
-                    "                        .:7PB##BGPYJ??77????JY5GPBB::.^&5         \n" +
-                    "                  .^7?J5GBBPY?7!!!!!!5B@BGB&#?!^.JB~::~@&:        \n" +
-                    "              :!5G#&BP5YJ7!!!!!!!7?Y5P5YJP5BP.::::#P.:!@B.        \n" +
-                    "      :!???JPB##BPJ7!!!!!!!!7?YPGP557^:.^BP#5:::::?#~.7@Y         \n" +
-                    "  :JPG#&#BGPYJ?7!!!!!!!!7?YGBPY7~::!~::::!B#5:::::^@?.J@Y         \n" +
-                    "  Y@@BY?!!!!!!!!7!!!!?YPB#G?^:::::::::::::J@Y:::::^Y~.Y@5         \n" +
-                    "  7@&PGBG5J7!!!!!7J5BGY7~^::::::::::::::::~&Y:::::::::5@?         \n" +
-                    "  .5@B55PGBBGYJ5G#GY!::::::::::::::::::::::~~:::::::::!@J         \n" +
-                    "   .J&&P5555PB@#7~::::::::::::~7?777::::::::::^^^::::::P@~        \n" +
-                    "     !@&P55555B&^:::::::::::^77^:::7J^::::::^??7?J~::::~@G.       \n" +
-                    "      Y@#55555P@P::::::::::~J~:^~:::J?::::::Y!:!^?J:::::P@^       \n" +
-                    "       P@B55555P&G^::::::::?7.:77:::77::::::J7~!7?^:::::5@~       \n" +
-                    "       !@@G55555P&?::::::::7Y::::::~Y^:::::::~!~^:::~:::5@~       \n" +
-                    "        ?@@B55555G&~::::::::7?!~~!??^:::::::::::::::PP::P&:       \n" +
-                    "         ~#@G55555&Y.::::::::^~!!~^:::::::::::::::::?@!.P#.       \n" +
-                    "          :#@BP555P&?:::::::::::::::::::::::::::::::~&Y.J@?       \n" +
-                    "           !@@&5555G#^::::::::::::::::::::::::::::^::~G:^&&:      \n" +
-                    "            J@@P5555P7^:::::::::::::::::::::::::^?7:::P~.5@?      \n" +
-                    "             7@B55555PB!:::::::::::::::::::::::~JJ^:::^^:!@@~     \n" +
-                    "              7@B55555GG:^^::::::::::::::::::^7J?^::::::::#@J     \n" +
-                    "               ?@B5555P#^::::::!!!~^:::::^~!77!^::::::::::G@5     \n" +
-                    "                J@B55P5&J::~7::::^~!!!!!77!~^:::::::::::::5@5     \n" +
-                    "                 ?@B5P5P&J::5~::::::::::::::::::::::::::::7@G     \n" +
-                    "                  ?@B5PPGG::^?::::::::::::::::::::::::::::!@&:    \n" +
-                    "                   5@G5PP&!.:!!::::::::!::::::::::::::::::~@@~    \n" +
-                    "                   :#@G55PBJ::~::::::::^:::::::::::::::::::B@5    \n" +
-                    "                    ?@&P55P&P^::::::::::^::::::::::::::::::7@@^   \n" +
-                    "                    ~@@#5555#B^::::::::~BY:::::::::7!:::::::G@?   \n" +
-                    "                     J@@#5555BB~::::::::JB7::::::::~^JP:::::?@B.  \n" +
-                    "                      !@@#5555GB?::::::::P?:::::::::.JG:::::7@&:  \n" +
-                    "                       G@@B5555PBP:::::::7Y::::::::::JB:::::~@P   \n" +
-                    "                       ^#@@P55555B5:::::::Y!:::::::::7&~!!.:^#&^  \n" +
-                    "                        :G@&P55555BY::::::^5^:::::::::GY^BJP#@@7  \n" +
-                    "                         .B@@G55555BY::::::7J:::::::::?&B@@&G?^   \n" +
-                    "                          ?@@&555555#Y::::::^::::::^?B@G?!^.      \n" +
-                    "                          .J&@&G55555#G^::::::::::7#@G!           \n" +
-                    "                            :7P##BP555B#~::::~YGBB@B^             \n" +
-                    "                               .~5##G55GB^:!P@#Y7!~.              \n" +
-                    "                                  :JB#BG&#G@@J.                   \n" +
-                    "                                     :!J5GGY^                     ");
+                    """
+                                                                 .^?5GGPJJJ?777!~:         \s
+                                                           .^7Y5P#&#BBGGGGPPPG&@@&?        \s
+                                                      .:~JPB@@@&B5?!?Y5PPGG5YYJ?!&5        \s
+                                                  .:7PB##BGPYJ??77????JY5GPBB::.^&5        \s
+                                            .^7?J5GBBPY?7!!!!!!5B@BGB&#?!^.JB~::~@&:       \s
+                                        :!5G#&BP5YJ7!!!!!!!7?Y5P5YJP5BP.::::#P.:!@B.       \s
+                                :!???JPB##BPJ7!!!!!!!!7?YPGP557^:.^BP#5:::::?#~.7@Y        \s
+                            :JPG#&#BGPYJ?7!!!!!!!!7?YGBPY7~::!~::::!B#5:::::^@?.J@Y        \s
+                            Y@@BY?!!!!!!!!7!!!!?YPB#G?^:::::::::::::J@Y:::::^Y~.Y@5        \s
+                            7@&PGBG5J7!!!!!7J5BGY7~^::::::::::::::::~&Y:::::::::5@?        \s
+                            .5@B55PGBBGYJ5G#GY!::::::::::::::::::::::~~:::::::::!@J        \s
+                             .J&&P5555PB@#7~::::::::::::~7?777::::::::::^^^::::::P@~       \s
+                               !@&P55555B&^:::::::::::^77^:::7J^::::::^??7?J~::::~@G.      \s
+                                Y@#55555P@P::::::::::~J~:^~:::J?::::::Y!:!^?J:::::P@^      \s
+                                 P@B55555P&G^::::::::?7.:77:::77::::::J7~!7?^:::::5@~      \s
+                                 !@@G55555P&?::::::::7Y::::::~Y^:::::::~!~^:::~:::5@~      \s
+                                  ?@@B55555G&~::::::::7?!~~!??^:::::::::::::::PP::P&:      \s
+                                   ~#@G55555&Y.::::::::^~!!~^:::::::::::::::::?@!.P#.      \s
+                                    :#@BP555P&?:::::::::::::::::::::::::::::::~&Y.J@?      \s
+                                     !@@&5555G#^::::::::::::::::::::::::::::^::~G:^&&:     \s
+                                      J@@P5555P7^:::::::::::::::::::::::::^?7:::P~.5@?     \s
+                                       7@B55555PB!:::::::::::::::::::::::~JJ^:::^^:!@@~    \s
+                                        7@B55555GG:^^::::::::::::::::::^7J?^::::::::#@J    \s
+                                         ?@B5555P#^::::::!!!~^:::::^~!77!^::::::::::G@5    \s
+                                          J@B55P5&J::~7::::^~!!!!!77!~^:::::::::::::5@5    \s
+                                           ?@B5P5P&J::5~::::::::::::::::::::::::::::7@G    \s
+                                            ?@B5PPGG::^?::::::::::::::::::::::::::::!@&:   \s
+                                             5@G5PP&!.:!!::::::::!::::::::::::::::::~@@~   \s
+                                             :#@G55PBJ::~::::::::^:::::::::::::::::::B@5   \s
+                                              ?@&P55P&P^::::::::::^::::::::::::::::::7@@^  \s
+                                              ~@@#5555#B^::::::::~BY:::::::::7!:::::::G@?  \s
+                                               J@@#5555BB~::::::::JB7::::::::~^JP:::::?@B. \s
+                                                !@@#5555GB?::::::::P?:::::::::.JG:::::7@&: \s
+                                                 G@@B5555PBP:::::::7Y::::::::::JB:::::~@P  \s
+                                                 ^#@@P55555B5:::::::Y!:::::::::7&~!!.:^#&^ \s
+                                                  :G@&P55555BY::::::^5^:::::::::GY^BJP#@@7 \s
+                                                   .B@@G55555BY::::::7J:::::::::?&B@@&G?^  \s
+                                                    ?@@&555555#Y::::::^::::::^?B@G?!^.     \s
+                                                    .J&@&G55555#G^::::::::::7#@G!          \s
+                                                      :7P##BP555B#~::::~YGBB@B^            \s
+                                                         .~5##G55GB^:!P@#Y7!~.             \s
+                                                            :JB#BG&#G@@J.                  \s
+                                                               :!J5GGY^                    \s""".indent(2));
         }
     }
 }

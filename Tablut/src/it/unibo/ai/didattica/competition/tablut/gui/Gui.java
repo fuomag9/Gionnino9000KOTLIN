@@ -13,7 +13,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.State;
 public class Gui {
 	
 	Background frame;
-	private int game;
+	private final int game;
 	
 	public Gui(int game) {
 		super();
@@ -37,29 +37,20 @@ public class Gui {
 	 */
 	private void initGUI() {
 		switch (this.game) {
-		case 1:
-			frame = new BackgroundTablut();
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setSize(280, 300);
-			break;
-		case 2:
-			frame = new BackgroundTablut();
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setSize(280, 300);
-			break;
-		case 3:
-			frame = new BackgroundBrandub();
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setSize(280, 300);
-			break;
-		case 4:
-			frame = new BackgroundTablut();
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setSize(280, 300);
-			break;
-		default:
-			System.out.println("Error in GUI init");
-			System.exit(4);
+			case 1, 4, 2 -> {
+				frame = new BackgroundTablut();
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setSize(280, 300);
+			}
+			case 3 -> {
+				frame = new BackgroundBrandub();
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setSize(280, 300);
+			}
+			default -> {
+				System.out.println("Error in GUI init");
+				System.exit(4);
+			}
 		}
 	}
 	
@@ -68,29 +59,30 @@ public class Gui {
 	 */
 	private void show() {
 		switch (game) {
-		case 1:
-			frame.setSize(370, 395);
-			frame.setTitle("ClassicTablut");
-			frame.setVisible(true);
-			break;
-		case 2:
-			frame.setSize(370, 395);
-			frame.setTitle("ModernTablut");
-			frame.setVisible(true);
-			break;
-		case 3:
-			frame.setSize(300, 330);
-			frame.setTitle("Brandub");
-			frame.setVisible(true);
-			break;
-		case 4:
-			frame.setSize(370, 395);
-			frame.setTitle("Tablut");
-			frame.setVisible(true);
-			break;
-		default:
-			System.out.println("Error in GUI show");
-			System.exit(4);
+			case 1 -> {
+				frame.setSize(370, 395);
+				frame.setTitle("ClassicTablut");
+				frame.setVisible(true);
+			}
+			case 2 -> {
+				frame.setSize(370, 395);
+				frame.setTitle("ModernTablut");
+				frame.setVisible(true);
+			}
+			case 3 -> {
+				frame.setSize(300, 330);
+				frame.setTitle("Brandub");
+				frame.setVisible(true);
+			}
+			case 4 -> {
+				frame.setSize(370, 395);
+				frame.setTitle("Tablut");
+				frame.setVisible(true);
+			}
+			default -> {
+				System.out.println("Error in GUI show");
+				System.exit(4);
+			}
 		}
 	}
 

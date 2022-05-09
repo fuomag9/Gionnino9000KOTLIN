@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,25 +33,24 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 	/**
 	 * Number of repeated states that can occur before a draw
 	 */
-	private int repeated_moves_allowed;
+	private final int repeated_moves_allowed;
 
 	/**
 	 * Number of states kept in memory. negative value means infinite.
 	 */
-	private int cache_size;
+	private final int cache_size;
 
 	/**
 	 * Counter for the moves without capturing that have occurred
 	 */
 	private int movesWithutCapturing;
 
-	private String gameLogName;
 	private File gameLog;
 	private FileHandler fh;
-	private Logger loggGame;
-	private List<String> citadels;
+	private final Logger loggGame;
+	private final List<String> citadels;
 	// private List<String> strangeCitadels;
-	private List<State> drawConditions;
+	private final List<State> drawConditions;
 
 	public GameAshtonTablut(int repeated_moves_allowed, int cache_size, String logs_folder, String whiteName, String blackName) {
 		this(new StateTablut(), repeated_moves_allowed, cache_size, logs_folder, whiteName, blackName);
@@ -66,8 +66,8 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 		Path p = Paths.get(logs_folder + File.separator + "_" + whiteName + "_vs_" + blackName + "_"
 				+ new Date().getTime() + "_gameLog.txt");
 		p = p.toAbsolutePath();
-		this.gameLogName = p.toString();
-		File gamefile = new File(this.gameLogName);
+		String gameLogName = p.toString();
+		File gamefile = new File(gameLogName);
 		try {
 			File f = new File(logs_folder);
 			f.mkdirs();
@@ -90,8 +90,8 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 		loggGame.fine("Repeated moves allowed:\t" + repeated_moves_allowed + "\tCache:\t" + cache_size);
 		loggGame.fine("Inizio partita");
 		loggGame.fine("Stato:\n" + state.toString());
-		drawConditions = new ArrayList<State>();
-		this.citadels = new ArrayList<String>();
+		drawConditions = new ArrayList<>();
+		this.citadels = new ArrayList<>();
 		// this.strangeCitadels = new ArrayList<String>();
 		this.citadels.add("a4");
 		this.citadels.add("a5");
@@ -109,10 +109,6 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 		this.citadels.add("e9");
 		this.citadels.add("f9");
 		this.citadels.add("e8");
-		// this.strangeCitadels.add("e1");
-		// this.strangeCitadels.add("a5");
-		// this.strangeCitadels.add("i5");
-		// this.strangeCitadels.add("e9");
 	}
 
 	/**
@@ -123,32 +119,22 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 	 *
 	 * @return			the resulting State obtained by performing the given
 	 *
-	 * @throws BoardException if the action causes a pawn to leave the board
-	 * @throws ActionException if the action format is wrong
-	 * @throws StopException if no action is made
-	 * @throws PawnException if a player is trying to move an opponent's pawn
-	 * @throws DiagonalException if a player is trying to move a pawn diagonally
-	 * @throws ClimbingException if a player is trying to make an action that would climb another pawn or special box illegally
-	 * @throws ThroneException if a player is trying to move a pawn to the throne
-	 * @throws OccupiedException if a player is trying to move a pawn onto a box that is already occupied
-	 * @throws ClimbingCitadelException if a player is trying to make an action that would climb the citadel
-	 * @throws CitadelException if a player is trying to move a pawn onto the citadel
 	 */
 	@Override
 	public State checkMove(State state, Action action)
-			throws BoardException, ActionException, StopException, PawnException, DiagonalException, ClimbingException,
-			ThroneException, OccupiedException, ClimbingCitadelException, CitadelException {
+			throws
+			CloneNotSupportedException {
 
 		if(isPossibleMove(state,action)) {
 
 			// se sono arrivato qui, muovo la pedina
-			state = this.movePawn(state, action);
+			this.movePawn(state, action);
 
 			// a questo punto controllo lo stato per eventuali catture
 			if (state.getTurn().equalsTurn("W")) {
-				state = this.checkCaptureBlack(state, action);
+				this.checkCaptureBlack(state, action);
 			} else if (state.getTurn().equalsTurn("B")) {
-				state = this.checkCaptureWhite(state, action);
+				this.checkCaptureWhite(state, action);
 			}
 
 			// if something has been captured, clear cache for draws
@@ -164,11 +150,6 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 				System.out.println(s.toString());
 
 				if (s.equals(state)) {
-					// DEBUG: //
-					// System.out.println("UGUALI:");
-					// System.out.println("STATO VECCHIO:\t" + s.toLinearString());
-					// System.out.println("STATO NUOVO:\t" +
-					// state.toLinearString());
 
 					trovati++;
 					if (trovati > repeated_moves_allowed) {
@@ -176,13 +157,8 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 						this.loggGame.fine("Partita terminata in pareggio per numero di stati ripetuti");
 						break;
 					}
-				} else {
-					// DEBUG: //
-					// System.out.println("DIVERSI:");
-					// System.out.println("STATO VECCHIO:\t" + s.toLinearString());
-					// System.out.println("STATO NUOVO:\t" +
-					// state.toLinearString());
-				}
+				}  // DEBUG: //
+
 			}
 			if (trovati > 0) {
 				this.loggGame.fine("Equal states found: " + trovati);
@@ -194,8 +170,8 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 
 			this.loggGame.fine("Current draw cache size: " + this.drawConditions.size());
 
-			this.loggGame.fine("Stato:\n" + state.toString());
-			System.out.println("Stato:\n" + state.toString());
+			this.loggGame.fine("Stato:\n" + state);
+			System.out.println("Stato:\n" + state);
 
 			return state;
 		}
@@ -277,7 +253,7 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 		return state;
 	}
 
-	private State checkCaptureBlackKingLeft(State state, Action a) {
+	private void checkCaptureBlackKingLeft(State state, Action a) {
 		// ho il re sulla sinistra
 		if (a.getColumnTo() > 1 && state.getPawn(a.getRowTo(), a.getColumnTo() - 1).equalsPawn("K")) {
 			//System.out.println("Ho il re sulla sinistra");
@@ -325,10 +301,9 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 				}
 			}
 		}
-		return state;
 	}
 
-	private State checkCaptureBlackKingRight(State state, Action a) {
+	private void checkCaptureBlackKingRight(State state, Action a) {
 		// ho il re sulla destra
 		if (a.getColumnTo() < state.getBoard().length - 2
 				&& (state.getPawn(a.getRowTo(), a.getColumnTo() + 1).equalsPawn("K"))) {
@@ -377,10 +352,9 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 				}
 			}
 		}
-		return state;
 	}
 
-	private State checkCaptureBlackKingDown(State state, Action a) {
+	private void checkCaptureBlackKingDown(State state, Action a) {
 		// ho il re sotto
 		if (a.getRowTo() < state.getBoard().length - 2
 				&& state.getPawn(a.getRowTo() + 1, a.getColumnTo()).equalsPawn("K")) {
@@ -429,10 +403,9 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 				}
 			}
 		}
-		return state;
 	}
 
-	private State checkCaptureBlackKingUp(State state, Action a) {
+	private void checkCaptureBlackKingUp(State state, Action a) {
 		// ho il re sopra
 		if (a.getRowTo() > 1 && state.getPawn(a.getRowTo() - 1, a.getColumnTo()).equalsPawn("K")) {
 			//System.out.println("Ho il re sopra");
@@ -480,10 +453,9 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 				}
 			}
 		}
-		return state;
 	}
 
-	private State checkCaptureBlackPawnRight(State state, Action a) {
+	private void checkCaptureBlackPawnRight(State state, Action a) {
 		// mangio a destra
 		if (a.getColumnTo() < state.getBoard().length - 2
 				&& state.getPawn(a.getRowTo(), a.getColumnTo() + 1).equalsPawn("W")) {
@@ -510,10 +482,9 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 
 		}
 
-		return state;
 	}
 
-	private State checkCaptureBlackPawnLeft(State state, Action a) {
+	private void checkCaptureBlackPawnLeft(State state, Action a) {
 		// mangio a sinistra
 		if (a.getColumnTo() > 1 && state.getPawn(a.getRowTo(), a.getColumnTo() - 1).equalsPawn("W")
 				&& (state.getPawn(a.getRowTo(), a.getColumnTo() - 2).equalsPawn("B")
@@ -524,10 +495,9 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 			this.movesWithutCapturing = -1;
 			this.loggGame.fine("Pedina bianca rimossa in: " + state.getBox(a.getRowTo(), a.getColumnTo() - 1));
 		}
-		return state;
 	}
 
-	private State checkCaptureBlackPawnUp(State state, Action a) {
+	private void checkCaptureBlackPawnUp(State state, Action a) {
 		// controllo se mangio sopra
 		if (a.getRowTo() > 1 && state.getPawn(a.getRowTo() - 1, a.getColumnTo()).equalsPawn("W")
 				&& (state.getPawn(a.getRowTo() - 2, a.getColumnTo()).equalsPawn("B")
@@ -538,10 +508,9 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 			this.movesWithutCapturing = -1;
 			this.loggGame.fine("Pedina bianca rimossa in: " + state.getBox(a.getRowTo() - 1, a.getColumnTo()));
 		}
-		return state;
 	}
 
-	private State checkCaptureBlackPawnDown(State state, Action a) {
+	private void checkCaptureBlackPawnDown(State state, Action a) {
 		// controllo se mangio sotto
 		if (a.getRowTo() < state.getBoard().length - 2
 				&& state.getPawn(a.getRowTo() + 1, a.getColumnTo()).equalsPawn("W")
@@ -553,7 +522,6 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 			this.movesWithutCapturing = -1;
 			this.loggGame.fine("Pedina bianca rimossa in: " + state.getBox(a.getRowTo() + 1, a.getColumnTo()));
 		}
-		return state;
 	}
 
 	private State checkCaptureBlack(State state, Action a) {
@@ -805,7 +773,7 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 	public List<Action> getActions(State state)
 	{
 		State.Turn turn = state.getTurn();
-		List<Action> possibleActions = new ArrayList<Action>();
+		List<Action> possibleActions = new ArrayList<>();
 
 		// Loop through rows
 		for (int i = 0; i < state.getBoard().length; i++)
@@ -833,15 +801,15 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 							String to = state.getBox(k, j);
 
 							Action action = null;
-							try {
-								action = new Action(from, to, turn);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+							action = new Action(from, to, turn);
 
 							// Check if action is admissible and if it is, add it to list possibleActions
-							if(isPossibleMove(state.clone(), action))
-								possibleActions.add(action);
+							try {
+								if(isPossibleMove(state.clone(), Objects.requireNonNull(action)))
+									possibleActions.add(action);
+							} catch (CloneNotSupportedException e) {
+								throw new RuntimeException(e);
+							}
 
 						} else break; // There is a pawn in the same column, and it cannot be crossed
 					}
@@ -861,15 +829,15 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 							String to = state.getBox(k, j);
 
 							Action action = null;
-							try {
-								action = new Action(from, to, turn);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+							action = new Action(from, to, turn);
 
 							// Check if action is admissible and if it is, add it to list possibleActions
-							if(isPossibleMove(state.clone(), action))
-								possibleActions.add(action);
+							try {
+								if(isPossibleMove(state.clone(), Objects.requireNonNull(action)))
+									possibleActions.add(action);
+							} catch (CloneNotSupportedException e) {
+								throw new RuntimeException(e);
+							}
 
 						} else 	break; // There is a pawn in the same column, and it cannot be crossed
 					}
@@ -889,15 +857,15 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 							String to = state.getBox(i, k);
 
 							Action action = null;
-							try {
-								action = new Action(from, to, turn);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+							action = new Action(from, to, turn);
 
 							// Check if action is admissible and if it is, add it to list possibleActions
-							if(isPossibleMove(state.clone(), action))
-								possibleActions.add(action);
+							try {
+								if(isPossibleMove(state.clone(), Objects.requireNonNull(action)))
+									possibleActions.add(action);
+							} catch (CloneNotSupportedException e) {
+								throw new RuntimeException(e);
+							}
 
 						} else break; // There is a pawn in the same row, and it cannot be crossed
 					}
@@ -918,15 +886,15 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 							String to = state.getBox(i, k);
 
 							Action action = null;
-							try {
-								action = new Action(from, to, turn);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+							action = new Action(from, to, turn);
 
 							// Check if action is admissible and if it is, add it to list possibleActions
-							if(isPossibleMove(state.clone(), action))
-								possibleActions.add(action);
+							try {
+								if(isPossibleMove(state.clone(), Objects.requireNonNull(action)))
+									possibleActions.add(action);
+							} catch (CloneNotSupportedException e) {
+								throw new RuntimeException(e);
+							}
 
 						} else break; // There is a pawn in the same row, and it cannot be crossed
 					}
@@ -948,13 +916,18 @@ public class GameAshtonTablut implements Game, Cloneable, aima.core.search.adver
 	public State getResult(State state, Action action)
 	{
 		// Move pawn
-		state = this.movePawn(state.clone(), action);
+		try {
+			state = this.movePawn(state.clone(), action);
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 
 		// Check the state for any capture
-		if (state.getTurn().equalsTurn("W"))
-			state = this.checkCaptureBlack(state, action);
-		else if (state.getTurn().equalsTurn("B"))
-			state = this.checkCaptureWhite(state, action);
+		if (state.getTurn().equalsTurn("W")) {
+			this.checkCaptureBlack(state, action);
+		} else if (state.getTurn().equalsTurn("B")) {
+			this.checkCaptureWhite(state, action);
+		}
 
 		return state;
 	}

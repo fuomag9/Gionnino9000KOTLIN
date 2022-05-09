@@ -19,14 +19,6 @@ public class BlackHeuristics extends Heuristics {
     private final int RHOMBUS_POS = 3;
     private final int BLOCKED_ESC = 3;
 
-    private final double PAWNS_AGGRESSION_WEIGHT = 2.0;
-
-    // Flag to enable console print
-    private boolean print = false;
-
-    // Number of tiles in rhombus
-    private final int TILES_IN_RHOMBUS = 8;
-
     // Weights for evaluation in the following order: WhiteEaten, BlackAlive, BlackSurroundingKing, RhombusPos
     private final Double[] earlyGameWeights;
     private final Double[] lateGameWeights;
@@ -76,9 +68,12 @@ public class BlackHeuristics extends Heuristics {
         double surroundKing = (double) checkAdjacentPawns(state, kingPos, State.Turn.BLACK.toString()) / getNumbToEatKing(state);
 
         double whiteInDanger = getPawnsAggression();
+        double PAWNS_AGGRESSION_WEIGHT = 2.0;
         if (whiteInDanger > 0)
             stateValue += (whiteInDanger / numbOfWhite) * PAWNS_AGGRESSION_WEIGHT;
 
+        // Flag to enable console print
+        boolean print = false;
         if (print) {
             System.out.println("Black pawns alive: " + numberOfBlackAlive);
             System.out.println("Number of pawns near to the king:" + surroundKing);
@@ -86,6 +81,8 @@ public class BlackHeuristics extends Heuristics {
         }
 
         if (!lateGame) { // Early Game
+            // Number of tiles in rhombus
+            int TILES_IN_RHOMBUS = 8;
             double pawnsInRhombus = (double) getRhombusValue() / TILES_IN_RHOMBUS;
 
             stateValue += numberOfWhiteEaten * earlyGameWeights[WHITE_EATEN];
@@ -98,7 +95,7 @@ public class BlackHeuristics extends Heuristics {
                 System.out.println("|EARLY_GAME|: value is " + stateValue);
             }
         } else { // Late Game
-            double blockingPawns = (double) blockingPawns();
+            double blockingPawns = blockingPawns();
 
             stateValue += numberOfWhiteEaten * lateGameWeights[WHITE_EATEN];
             stateValue += numberOfBlackAlive * lateGameWeights[BLACK_ALIVE];

@@ -25,13 +25,11 @@ public abstract class TablutClient implements Runnable {
 
 	private State.Turn player;
 	private String name;
-	private Socket playerSocket;
-	private DataInputStream in;
-	private DataOutputStream out;
-	private Gson gson;
+	private final DataInputStream in;
+	private final DataOutputStream out;
+	private final Gson gson;
 	private State currentState;
-	private int timeout;
-	private String serverIp;
+	private final int timeout;
 
 	public State.Turn getPlayer() {
 		return player;
@@ -60,25 +58,22 @@ public abstract class TablutClient implements Runnable {
 	 *            The timeout that will be taken into account (in seconds)
 	 * @param ipAddress
 	 *            The ipAddress of the server
-	 * @throws UnknownHostException
-	 * @throws IOException
 	 */
 	public TablutClient(String player, String name, int timeout, String ipAddress)
-			throws UnknownHostException, IOException {
-		int port = 0;
-		serverIp = ipAddress;
+			throws IOException {
+		int port;
 		this.timeout = timeout;
 		this.gson = new Gson();
-		if (player.toLowerCase().equals("white")) {
+		if (player.equalsIgnoreCase("white")) {
 			this.player = State.Turn.WHITE;
 			port = Configuration.whitePort;
-		} else if (player.toLowerCase().equals("black")) {
+		} else if (player.equalsIgnoreCase("black")) {
 			this.player = State.Turn.BLACK;
 			port = Configuration.blackPort;
 		} else {
 			throw new InvalidParameterException("Player role must be BLACK or WHITE");
 		}
-		playerSocket = new Socket(serverIp, port);
+		Socket playerSocket = new Socket(ipAddress, port);
 		out = new DataOutputStream(playerSocket.getOutputStream());
 		in = new DataInputStream(playerSocket.getInputStream());
 		this.name = name;
@@ -94,10 +89,8 @@ public abstract class TablutClient implements Runnable {
 	 *            The name of the player
 	 * @param timeout
 	 *            The timeout that will be taken into account (in seconds)
-	 * @throws UnknownHostException
-	 * @throws IOException
 	 */
-	public TablutClient(String player, String name, int timeout) throws UnknownHostException, IOException {
+	public TablutClient(String player, String name, int timeout) throws IOException {
 		this(player, name, timeout, "localhost");
 	}
 
@@ -110,10 +103,8 @@ public abstract class TablutClient implements Runnable {
 	 *            The role of the player (black or white)
 	 * @param name
 	 *            The name of the player
-	 * @throws UnknownHostException
-	 * @throws IOException
 	 */
-	public TablutClient(String player, String name) throws UnknownHostException, IOException {
+	public TablutClient(String player, String name) throws IOException {
 		this(player, name, 60, "localhost");
 	}
 
@@ -127,10 +118,8 @@ public abstract class TablutClient implements Runnable {
 	 *            The name of the player
 	 * @param ipAddress
 	 *            The ipAddress of the server
-	 * @throws UnknownHostException
-	 * @throws IOException
 	 */
-	public TablutClient(String player, String name, String ipAddress) throws UnknownHostException, IOException {
+	public TablutClient(String player, String name, String ipAddress) throws IOException {
 		this(player, name, 60, ipAddress);
 	}
 
@@ -146,21 +135,21 @@ public abstract class TablutClient implements Runnable {
 	/**
 	 * Write an action to the server
 	 */
-	public void write(Action action) throws IOException, ClassNotFoundException {
+	public void write(Action action) throws IOException {
 		StreamUtils.writeString(out, this.gson.toJson(action));
 	}
 
 	/**
 	 * Write the name to the server
 	 */
-	public void declareName() throws IOException, ClassNotFoundException {
+	public void declareName() throws IOException {
 		StreamUtils.writeString(out, this.gson.toJson(this.name));
 	}
 
 	/**
 	 * Read the state from the server
 	 */
-	public void read() throws ClassNotFoundException, IOException {
+	public void read() throws IOException {
 		this.currentState = this.gson.fromJson(StreamUtils.readString(in), StateTablut.class);
 	}
 }

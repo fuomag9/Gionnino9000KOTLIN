@@ -1,16 +1,11 @@
 package it.unibo.ai.didattica.competition.tablut.client;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
-
-import com.google.gson.Gson;
 
 import it.unibo.ai.didattica.competition.tablut.domain.*;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
@@ -22,27 +17,27 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
  */
 public class TablutRandomClient extends TablutClient {
 
-	private int game;
+	private final int game;
 
-	public TablutRandomClient(String player, String name, int gameChosen, int timeout, String ipAddress) throws UnknownHostException, IOException {
+	public TablutRandomClient(String player, String name, int gameChosen, int timeout, String ipAddress) throws IOException {
 		super(player, name, timeout, ipAddress);
 		game = gameChosen;
 	}
 	
-	public TablutRandomClient(String player, String name, int timeout, String ipAddress) throws UnknownHostException, IOException {
+	public TablutRandomClient(String player, String name, int timeout, String ipAddress) throws IOException {
 		this(player, name, 4, timeout, ipAddress);
 	}
 	
-	public TablutRandomClient(String player, int timeout, String ipAddress) throws UnknownHostException, IOException {
+	public TablutRandomClient(String player, int timeout, String ipAddress) throws IOException {
 		this(player, "random", 4, timeout, ipAddress);
 	}
 
-	public TablutRandomClient(String player) throws UnknownHostException, IOException {
+	public TablutRandomClient(String player) throws IOException {
 		this(player, "random", 4, 60, "localhost");
 	}
 
 
-	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
+	public static void main(String[] args) throws IOException {
 		int gametype = 4;
 		String role = "";
 		String name = "random";
@@ -82,38 +77,39 @@ public class TablutRandomClient extends TablutClient {
 
 		Game rules = null;
 		switch (this.game) {
-		case 1:
-			state = new StateTablut();
-			rules = new GameTablut();
-			break;
-		case 2:
-			state = new StateTablut();
-			rules = new GameModernTablut();
-			break;
-		case 3:
-			state = new StateBrandub();
-			rules = new GameTablut();
-			break;
-		case 4:
-			state = new StateTablut();
-			state.setTurn(State.Turn.WHITE);
-			rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
-			System.out.println("Ashton Tablut game");
-			break;
-		default:
-			System.out.println("Error in game selection");
-			System.exit(4);
+			case 1 -> {
+				state = new StateTablut();
+				rules = new GameTablut();
+			}
+			case 2 -> {
+				state = new StateTablut();
+				rules = new GameModernTablut();
+			}
+			case 3 -> {
+				state = new StateBrandub();
+				rules = new GameTablut();
+			}
+			case 4 -> {
+				state = new StateTablut();
+				state.setTurn(Turn.WHITE);
+				rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
+				System.out.println("Ashton Tablut game");
+			}
+			default -> {
+				System.out.println("Error in game selection");
+				System.exit(4);
+			}
 		}
 
-		List<int[]> pawns = new ArrayList<int[]>();
-		List<int[]> empty = new ArrayList<int[]>();
+		List<int[]> pawns = new ArrayList<>();
+		List<int[]> empty = new ArrayList<>();
 
 		System.out.println("You are player " + this.getPlayer().toString() + "!");
 
 		while (true) {
 			try {
 				this.read();
-			} catch (ClassNotFoundException | IOException e1) {
+			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				System.exit(1);
@@ -124,6 +120,7 @@ public class TablutRandomClient extends TablutClient {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
 			}
 
 			if (this.getPlayer().equals(Turn.WHITE)) {
@@ -147,16 +144,12 @@ public class TablutRandomClient extends TablutClient {
 						}
 					}
 
-					int[] selected = null;
+					int[] selected;
 
 					boolean found = false;
 					Action a = null;
-					try {
-						a = new Action("z0", "z0", State.Turn.WHITE);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+					a = new Action("z0", "z0", Turn.WHITE);
+
 					while (!found) {
 						if (pawns.size() > 1) {
 							selected = pawns.get(new Random().nextInt(pawns.size() - 1));
@@ -169,26 +162,22 @@ public class TablutRandomClient extends TablutClient {
 						selected = empty.get(new Random().nextInt(empty.size() - 1));
 						String to = this.getCurrentState().getBox(selected[0], selected[1]);
 
-						try {
-							a = new Action(from, to, State.Turn.WHITE);
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
+						a = new Action(from, to, Turn.WHITE);
+
 
 						try {
 							rules.checkMove(state, a);
 							found = true;
 						} catch (Exception e) {
-
+							throw new RuntimeException(e);
 						}
 
 					}
 
-					System.out.println("Mossa scelta: " + a.toString());
+					System.out.println("Mossa scelta: " + Objects.requireNonNull(a));
 					try {
 						this.write(a);
-					} catch (ClassNotFoundException | IOException e) {
+					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -237,17 +226,12 @@ public class TablutRandomClient extends TablutClient {
 						}
 					}
 
-					int[] selected = null;
+					int[] selected;
 
 					boolean found = false;
 					Action a = null;
-					try {
-						a = new Action("z0", "z0", State.Turn.BLACK);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					;
+					a = new Action("z0", "z0", Turn.BLACK);
+
 					while (!found) {
 						selected = pawns.get(new Random().nextInt(pawns.size() - 1));
 						String from = this.getCurrentState().getBox(selected[0], selected[1]);
@@ -255,27 +239,23 @@ public class TablutRandomClient extends TablutClient {
 						selected = empty.get(new Random().nextInt(empty.size() - 1));
 						String to = this.getCurrentState().getBox(selected[0], selected[1]);
 
-						try {
-							a = new Action(from, to, State.Turn.BLACK);
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
+						a = new Action(from, to, Turn.BLACK);
 
-						System.out.println("try: " + a.toString());
+
+						System.out.println("try: " + Objects.requireNonNull(a));
 						try {
 							rules.checkMove(state, a);
 							found = true;
 						} catch (Exception e) {
-
+							throw new RuntimeException(e);
 						}
 
 					}
 
-					System.out.println("Mossa scelta: " + a.toString());
+					System.out.println("Mossa scelta: " + a);
 					try {
 						this.write(a);
-					} catch (ClassNotFoundException | IOException e) {
+					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}

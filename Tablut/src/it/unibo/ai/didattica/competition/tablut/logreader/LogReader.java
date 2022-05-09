@@ -4,9 +4,9 @@
 package it.unibo.ai.didattica.competition.tablut.logreader;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
@@ -16,23 +16,19 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
  */
 public class LogReader {
 
-	private static BufferedReader br;
-
 	/**
-	 * @param args
-	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Map<String, Integer> wins = new HashMap<String, Integer>();
-		Map<String, Integer> draws = new HashMap<String, Integer>();
-		Map<String, Integer> losses = new HashMap<String, Integer>();
-		Map<String, Integer> winmoves = new HashMap<String, Integer>();
-		Map<String, Integer> lossmoves = new HashMap<String, Integer>();
-		Map<String, Integer> captures = new HashMap<String, Integer>();
-		Map<String, Integer> captured = new HashMap<String, Integer>();
-		Map<String, Integer> games = new HashMap<String, Integer>();
-		Map<String, Integer> moves = new HashMap<String, Integer>();
+		Map<String, Integer> wins = new HashMap<>();
+		Map<String, Integer> draws = new HashMap<>();
+		Map<String, Integer> losses = new HashMap<>();
+		Map<String, Integer> winmoves = new HashMap<>();
+		Map<String, Integer> lossmoves = new HashMap<>();
+		Map<String, Integer> captures = new HashMap<>();
+		Map<String, Integer> captured = new HashMap<>();
+		Map<String, Integer> games = new HashMap<>();
+		Map<String, Integer> moves = new HashMap<>();
 
 		File game_out_file = new File("games.txt");
 		if (!game_out_file.exists()) {
@@ -49,19 +45,19 @@ public class LogReader {
 
 		PrintWriter players_out = new PrintWriter(players_out_file);
 		players_out
-				.write("Player\tPoints\tWins\tLosses\tDraws\tCaptures\tCaptured\tMove points\tWin moves\tLoss moves\tTot moves\t"
-						+ "AVG Points\tAVG Wins\tAVG Losses\tAVG Draws\tAVG Captures\tAVG Captured\tAVG moves"
-						+ "\n\n");
+				.write("""
+						Player\tPoints\tWins\tLosses\tDraws\tCaptures\tCaptured\tMove points\tWin moves\tLoss moves\tTot moves\tAVG Points\tAVG Wins\tAVG Losses\tAVG Draws\tAVG Captures\tAVG Captured\tAVG moves
+
+						""");
 
 		try (Stream<Path> path_stream = Files.list(Paths.get("logs").toAbsolutePath())) {
-			List<String> path_list = path_stream.filter(Files::isRegularFile).map(x -> x.toString())
-					.collect(Collectors.toList());
+			List<String> path_list = path_stream.filter(Files::isRegularFile).map(Path::toString).toList();
 
 			for (String file_path : path_list) {
 				if (file_path.contains("_vs_")) {
 					File file = new File(file_path);
 
-					br = new BufferedReader(new FileReader(file));
+					BufferedReader br = new BufferedReader(new FileReader(file));
 
 					String whiteP = "whiteP";
 					String blackP = "blackP";
@@ -75,7 +71,7 @@ public class LogReader {
 					String line;
 					while ((line = br.readLine()) != null) {
 
-						line = new String(line.getBytes(), "UTF-8");
+						line = new String(line.getBytes(), StandardCharsets.UTF_8);
 
 						if (line.contains("Players")) {
 							System.out.println(line);
@@ -83,21 +79,20 @@ public class LogReader {
 							int len = splits.length;
 							line = line.split(":")[len - 1];
 							splits = line.split("vs");
-							len = splits.length;
-							whiteP = splits[0].replaceAll("_", "").replaceAll("\t", "");
+                            whiteP = splits[0].replaceAll("_", "").replaceAll("\t", "");
 
 							blackP = splits[1].replaceAll("_", "").replaceAll("\t", "");
 
 							// TODO: this is unnecessary if the server writes
 							// things
 							// properly
-							String temp = "";
+							StringBuilder temp = new StringBuilder();
 							for (int i = 0; i < blackP.length() && i < 10; i++) {
 								char c = blackP.charAt(i);
 								if (Character.isAlphabetic(c) || Character.isDigit(c))
-									temp += c;
+									temp.append(c);
 							}
-							blackP = temp;
+							blackP = temp.toString();
 
 						} else if (line.contains("Turn") && !line.contains("checkMove"))
 							turn_counter++;
@@ -120,7 +115,7 @@ public class LogReader {
 					int black_turns = turn_counter / 2;
 					int white_turns = turn_counter / 2 + (turn_counter % 2);
 
-					for (Map<String, Integer> map : new Map[] { wins, draws, losses, winmoves, lossmoves, captures,
+					for (Map map : new Map[] { wins, draws, losses, winmoves, lossmoves, captures,
 							moves, games, captured }) {
 						if (!map.containsKey(whiteP)) {
 							map.put(whiteP, 0);
@@ -145,24 +140,24 @@ public class LogReader {
 						moves.put(whiteP, moves.get(whiteP) + white_turns);
 
 						switch (ending) {
-						case DRAW:
-							draws.put(whiteP, draws.get(whiteP) + 1);
-							draws.put(blackP, draws.get(blackP) + 1);
-							break;
-						case BLACKWIN:
-							losses.put(whiteP, losses.get(whiteP) + 1);
-							wins.put(blackP, wins.get(blackP) + 1);
-							lossmoves.put(whiteP, lossmoves.get(whiteP) + white_turns);
-							winmoves.put(blackP, winmoves.get(blackP) + black_turns);
-							break;
-						case WHITEWIN:
-							wins.put(whiteP, wins.get(whiteP) + 1);
-							losses.put(blackP, losses.get(blackP) + 1);
-							winmoves.put(whiteP, winmoves.get(whiteP) + white_turns);
-							lossmoves.put(blackP, lossmoves.get(blackP) + black_turns);
-							break;
-						default:
-							break;
+							case DRAW -> {
+								draws.put(whiteP, draws.get(whiteP) + 1);
+								draws.put(blackP, draws.get(blackP) + 1);
+							}
+							case BLACKWIN -> {
+								losses.put(whiteP, losses.get(whiteP) + 1);
+								wins.put(blackP, wins.get(blackP) + 1);
+								lossmoves.put(whiteP, lossmoves.get(whiteP) + white_turns);
+								winmoves.put(blackP, winmoves.get(blackP) + black_turns);
+							}
+							case WHITEWIN -> {
+								wins.put(whiteP, wins.get(whiteP) + 1);
+								losses.put(blackP, losses.get(blackP) + 1);
+								winmoves.put(whiteP, winmoves.get(whiteP) + white_turns);
+								lossmoves.put(blackP, lossmoves.get(blackP) + black_turns);
+							}
+							default -> {
+							}
 						}
 
 						game_out.write(

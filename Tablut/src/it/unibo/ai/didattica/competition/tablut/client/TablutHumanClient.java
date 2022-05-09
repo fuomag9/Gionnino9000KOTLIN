@@ -16,11 +16,11 @@ import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
  */
 public class TablutHumanClient extends TablutClient {
 
-	public TablutHumanClient(String player) throws UnknownHostException, IOException {
+	public TablutHumanClient(String player) throws IOException {
 		super(player, "humanInterface");
 	}
 
-	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
+	public static void main(String[] args) throws IOException {
 
 		if (args.length == 0) {
 			System.out.println("You must specify which player you are (WHITE or BLACK)!");
@@ -37,8 +37,8 @@ public class TablutHumanClient extends TablutClient {
 	@Override
 	public void run() {
 		System.out.println("You are player " + this.getPlayer().toString() + "!");
-		String actionStringFrom = "";
-		String actionStringTo = "";
+		String actionStringFrom;
+		String actionStringTo;
 		Action action;
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		try {

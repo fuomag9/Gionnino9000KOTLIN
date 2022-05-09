@@ -15,7 +15,7 @@ import it.unibo.ai.didattica.competition.tablut.exceptions.ThroneException;
  */
 public class GameModernTablut implements Game {
 
-	private int movesDraw;
+	private final int movesDraw;
 	private int movesWithutCapturing;
 
 	public GameModernTablut() {
@@ -135,14 +135,14 @@ public class GameModernTablut implements Game {
 		}
 
 		// se sono arrivato qui, muovo la pedina
-		state = this.movePawn(state, a);
+		this.movePawn(state, a);
 
 		// a questo punto controllo lo stato per eventuali catture
 		if (state.getTurn().equalsTurn("W")) {
-			state = this.checkCaptureBlack(state, a);
+			this.checkCaptureBlack(state, a);
 		}
 		if (state.getTurn().equalsTurn("B")) {
-			state = this.checkCaptureWhite(state, a);
+			this.checkCaptureWhite(state, a);
 		}
 
 		// this.loggGame.fine("Stato: "+state.toString());

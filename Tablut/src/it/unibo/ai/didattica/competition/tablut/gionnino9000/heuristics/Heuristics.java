@@ -9,7 +9,7 @@ import java.util.List;
 
 public abstract class Heuristics {
 
-    protected State state;
+    protected final State state;
 
     // Matrix of camps
     private final int[][] camps = {
@@ -117,16 +117,14 @@ public abstract class Heuristics {
             return true;
         if (Arrays.stream(camps).anyMatch(camp -> Arrays.equals(camp, new int[]{pos[0],pos[1]-1})))
             return true;
-        if (Arrays.stream(camps).anyMatch(camp -> Arrays.equals(camp, new int[]{pos[0],pos[1]+1})))
-            return true;
-        return false;
+        return Arrays.stream(camps).anyMatch(camp -> Arrays.equals(camp, new int[]{pos[0], pos[1] + 1}));
     }
 
     /**
      * @return the adjacent positions occupied by target
      */
     protected List<int[]> adjacentPositionsOccupied(State state,int[] position, String target){
-        List<int[]> occupiedPositions = new ArrayList<int[]>();
+        List<int[]> occupiedPositions = new ArrayList<>();
         int[] pos = new int[2];
 
         State.Pawn[][] board = state.getBoard();
@@ -164,7 +162,7 @@ public abstract class Heuristics {
     /**
      * @return true if king is on a center tile
      */
-    public boolean isKingOnCenter(State state,int[] kingPosition) {
+    public boolean isKingOnCenter(int[] kingPosition) {
         return (kingPosition[0] > 2 && kingPosition[0] < 6 && kingPosition[1] > 2 && kingPosition[1] < 6);
     }
 
@@ -174,7 +172,7 @@ public abstract class Heuristics {
     public int[] getKingEscapes(State state, int[] kingPosition) {
         int[] escapes = new int[4];
 
-        if (!isKingOnCenter(state, kingPosition)) {
+        if (!isKingOnCenter(kingPosition)) {
             if ((!(kingPosition[1] > 2 && kingPosition[1] < 6)) && (!(kingPosition[0] > 2 && kingPosition[0] < 6))) {
                 int[] tempV = countFreeColumn(state, kingPosition);
                 int[] tempH = countFreeRow(state, kingPosition);
@@ -283,7 +281,7 @@ public abstract class Heuristics {
 
         if (kingPosition[0] == 4 && kingPosition[1] == 4){
             return 4;
-        } else if (isKingOnCenter(state, kingPosition)) {
+        } else if (isKingOnCenter(kingPosition)) {
             return 3;
         } else if (checkAdjacentCamp(kingPosition)) {
             return 1;
@@ -301,7 +299,6 @@ public abstract class Heuristics {
         int count = 0;
 
         if (quadrant == 1 || quadrant == 2) {
-            rowRange[0] = 0;
             rowRange[1] = 3;
         } else {
             rowRange[0] = 5;
@@ -309,7 +306,6 @@ public abstract class Heuristics {
         }
 
         if(quadrant == 1 || quadrant == 3) {
-            columnRange[0] = 0;
             columnRange[1] = 3;
         } else {
             columnRange[0] = 5;
@@ -336,9 +332,7 @@ public abstract class Heuristics {
     public boolean checkUpside(State state, State.Pawn enemy, int[] position) {
         for(int i = position[0]; i >= 0; i--) {
             if (isPositionOccupied(state, position)) {
-                if (state.getBoard()[i][position[1]].equalsPawn(enemy.toString()))
-                    return true;
-                else return false;
+                return state.getBoard()[i][position[1]].equalsPawn(enemy.toString());
             }
             if ((position[1] == 0 || position[1] == 8) && i == 3)
                 return false;
@@ -358,9 +352,7 @@ public abstract class Heuristics {
     public boolean checkDownside(State state, State.Pawn enemy, int[] position) {
         for(int i = position[0]; i <= 8; i++) {
             if (isPositionOccupied(state, position)) {
-                if (state.getBoard()[i][position[1]].equalsPawn(enemy.toString()))
-                    return true;
-                else return false;
+                return state.getBoard()[i][position[1]].equalsPawn(enemy.toString());
             }
             if ((position[1] == 0 || position[1] == 8) && i == 5)
                 return false;
@@ -380,9 +372,7 @@ public abstract class Heuristics {
     public boolean checkRightSide(State state, State.Pawn enemy, int[] position) {
         for(int i = position[1]; i <= 8; i++) {
             if (isPositionOccupied(state, position)) {
-                if (state.getBoard()[position[0]][i].equalsPawn(enemy.toString()))
-                    return true;
-                else return false;
+                return state.getBoard()[position[0]][i].equalsPawn(enemy.toString());
             }
             if ((position[0] == 0 || position[0] == 8) && i == 5)
                 return false;
@@ -402,9 +392,7 @@ public abstract class Heuristics {
     public boolean checkLeftSide(State state, State.Pawn enemy, int[] position) {
         for(int i = position[1]; i >= 0; i--) {
             if (isPositionOccupied(state, position)) {
-                if (state.getBoard()[position[0]][i].equalsPawn(enemy.toString()))
-                    return true;
-                else return false;
+                return state.getBoard()[position[0]][i].equalsPawn(enemy.toString());
             }
             if ((position[0] == 0 || position[0] == 8) && i == 3)
                 return false;
@@ -428,7 +416,7 @@ public abstract class Heuristics {
         State.Pawn enemy = (pawn.equalsPawn(State.Pawn.WHITE.toString()) || pawn.equalsPawn(State.Pawn.KING.toString())) ? State.Pawn.BLACK : State.Pawn.WHITE;
 
         // if is king and on center we have special cases
-        if (pawn.equalsPawn(State.Pawn.KING.toString()) && isKingOnCenter(state, position)) {
+        if (pawn.equalsPawn(State.Pawn.KING.toString()) && isKingOnCenter(position)) {
             int needed = getNumbToEatKing(state);
 
             // if king is in danger (1 more enemy pawn to kill)
@@ -456,10 +444,7 @@ public abstract class Heuristics {
 
         if (verticalCapturePossible(position, enemy))
             return true;
-        if (horizontalCapturePossible(position, enemy))
-            return true;
-
-        return false;
+        return horizontalCapturePossible(position, enemy);
     }
 
     /**
@@ -493,9 +478,7 @@ public abstract class Heuristics {
                 (isPositionOccupied(state, targetPos) && state.getPawn(targetPos[0], targetPos[1]).equalsPawn(enemy.toString()))) {
             checkPos[0] = position[0] - 1;
             checkPos[1] = position[1];
-            if (!isPositionOccupied(state, checkPos) && (checkLeftSide(state, enemy, checkPos) || checkRightSide(state, enemy, checkPos))) {
-                return true;
-            }
+            return !isPositionOccupied(state, checkPos) && (checkLeftSide(state, enemy, checkPos) || checkRightSide(state, enemy, checkPos));
         }
 
         return false;
@@ -531,9 +514,7 @@ public abstract class Heuristics {
                 (isPositionOccupied(state, targetPos) && state.getPawn(targetPos[0], targetPos[1]).equalsPawn(enemy.toString()))) {
             checkPos[0] = position[0];
             checkPos[1] = position[1] - 1;
-            if (!isPositionOccupied(state, checkPos) && (checkUpside(state, enemy, checkPos) || checkDownside(state, enemy, checkPos))) {
-                return true;
-            }
+            return !isPositionOccupied(state, checkPos) && (checkUpside(state, enemy, checkPos) || checkDownside(state, enemy, checkPos));
         }
 
         return false;

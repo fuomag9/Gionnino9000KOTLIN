@@ -1,6 +1,7 @@
 package it.unibo.ai.didattica.competition.tablut.domain;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.InvalidParameterException;
 
@@ -12,14 +13,15 @@ import java.security.InvalidParameterException;
  */
 public class Action implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 
 	private String from;
 	private String to;
 
 	private State.Turn turn;
 
-	public Action(String from, String to, StateTablut.Turn t) throws IOException {
+	public Action(String from, String to, StateTablut.Turn t) {
 		if (from.length() != 2 || to.length() != 2) {
 			throw new InvalidParameterException("the FROM and the TO string must have length=2");
 		} else {

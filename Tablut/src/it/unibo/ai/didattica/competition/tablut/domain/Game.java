@@ -42,12 +42,10 @@ public interface Game {
 	 *             try to move a pawn into the throne boxe
 	 * @throws OccupiedException
 	 *             try to move a pawn into an ccupited box
-	 * @throws ClimbingCitadelException
-	 * @throws CitadelException
-	 */
-	public State checkMove(State state, Action a)
+     */
+	State checkMove(State state, Action a)
 			throws BoardException, ActionException, StopException, PawnException, DiagonalException, ClimbingException,
-			ThroneException, OccupiedException, ClimbingCitadelException, CitadelException;
+			ThroneException, OccupiedException, CloneNotSupportedException;
 
-	public void endGame(State state);
+	void endGame(State state);
 }

@@ -19,9 +19,6 @@ public class WhiteHeuristics extends Heuristics{
     private final int KING_MOVEMENT = 2;
     private final int SAFE_PAWNS = 3;
 
-    // Flag to enable console print
-    private boolean print = false;
-
     // Weights for evaluation in the following order: WhiteAlive, BlackEaten, BestTiles, NumKingEscapes
     private final Double[] gameWeights;
 
@@ -68,6 +65,8 @@ public class WhiteHeuristics extends Heuristics{
 
         stateValue += evalKingEsc;
 
+        // Flag to enable console print
+        boolean print = false;
         if (print) {
             System.out.println("White pawns alive: " + numberOfWhiteAlive);
             System.out.println("Number of black pawns eaten: " + numberOfBlackEaten);

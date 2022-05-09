@@ -15,11 +15,11 @@ import it.unibo.ai.didattica.competition.tablut.gui.Gui;
 public class CheckerMove implements ActionListener {
 
 	private Gui theGui;
-	private JTextField posizione;
+	private final JTextField posizione;
 	private State state;
-	private TestGuiFrame ret;
-	private Game game;
-	private JRadioButton turno;
+	private final TestGuiFrame ret;
+	private final Game game;
+	private final JRadioButton turno;
 
 	public CheckerMove(Gui theGui, JTextField field, State state, TestGuiFrame ret, Game game, JRadioButton jr) {
 		super();
@@ -48,11 +48,11 @@ public class CheckerMove implements ActionListener {
 			String da = "" + posizione.getText().charAt(0) + posizione.getText().charAt(1);
 			String a = "" + posizione.getText().charAt(3) + posizione.getText().charAt(4);
 			posizione.setText("");
-			Action az = null;
+			Action az;
 			try {
 				az = new Action(da, a, t);
 			} catch (Exception ex) {
-
+				throw new RuntimeException(ex);
 			}
 
 			try {

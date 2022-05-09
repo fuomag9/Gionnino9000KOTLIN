@@ -1,5 +1,6 @@
 package it.unibo.ai.didattica.competition.tablut.domain;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -10,7 +11,8 @@ import java.io.Serializable;
  */
 public class StateBrandub extends State implements Serializable{
 	
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 
 	public StateBrandub() 
 	{

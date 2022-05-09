@@ -14,10 +14,10 @@ import it.unibo.ai.didattica.competition.tablut.gui.Gui;
 
 public class AggiungiBianco implements ActionListener {
 
-	private Gui theGui;
-	private JTextField posizione;
-	private State state;
-	private TestGuiFrame ret;
+	private final Gui theGui;
+	private final JTextField posizione;
+	private final State state;
+	private final TestGuiFrame ret;
 
 	public AggiungiBianco(Gui theGui, JTextField field, State state, TestGuiFrame ret) {
 		super();
@@ -31,17 +31,13 @@ public class AggiungiBianco implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String casella = posizione.getText();
 		posizione.setText("");
-		Action a = null;
-		try {
-			a = new Action(casella, casella, Turn.WHITE);
-			int column = a.getColumnFrom();
-			int row = a.getRowFrom();
-			this.state.getBoard()[row][column] = Pawn.WHITE;
-			this.theGui.update(state);
-			this.ret.setState(state);
-		} catch (IOException e1) {
-			System.out.println("Wrong format of the position. Write position as \"A1\" where A1 is the cell");
-		}
+		Action a;
+		a = new Action(casella, casella, Turn.WHITE);
+		int column = a.getColumnFrom();
+		int row = a.getRowFrom();
+		this.state.getBoard()[row][column] = Pawn.WHITE;
+		this.theGui.update(state);
+		this.ret.setState(state);
 	}
 
 }

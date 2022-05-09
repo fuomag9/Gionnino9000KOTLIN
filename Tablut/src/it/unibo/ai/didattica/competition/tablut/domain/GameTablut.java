@@ -18,12 +18,10 @@ import it.unibo.ai.didattica.competition.tablut.exceptions.*;
  */
 public class GameTablut implements Game {
 	
-	private int movesDraw;
+	private final int movesDraw;
 	private int movesWithutCapturing;
-	private String gameLogName;
-	private File gameLog;
-	private FileHandler fh;
-	private Logger loggGame;
+    private File gameLog;
+    private final Logger loggGame;
 	
 	public GameTablut() {
 		this(0);
@@ -33,9 +31,9 @@ public class GameTablut implements Game {
 		super();
 		this.movesDraw = moves;
 		this.movesWithutCapturing=0;
-		this.gameLogName = (new Date().getTime())+"_gameLog.txt";
-		this.setGameLog(new File(this.gameLogName));
-		fh = null;
+        String gameLogName = (new Date().getTime()) + "_gameLog.txt";
+		this.setGameLog(new File(gameLogName));
+        FileHandler fh = null;
 		try
 		{
 			fh = new FileHandler(gameLogName, true);
@@ -46,8 +44,8 @@ public class GameTablut implements Game {
 			System.exit(1);
 		}
 		this.loggGame = Logger.getLogger("GameLog");
-		loggGame.addHandler(this.fh);
-		this.fh.setFormatter(new SimpleFormatter());
+		loggGame.addHandler(fh);
+		fh.setFormatter(new SimpleFormatter());
 		loggGame.setLevel(Level.FINE);
 		loggGame.fine("Inizio partita");
 	}
@@ -188,19 +186,19 @@ public class GameTablut implements Game {
 		}
 		
 		//se sono arrivato qui, muovo la pedina
-		state = this.movePawn(state, a);
-		
+		this.movePawn(state, a);
+
 		//a questo punto controllo lo stato per eventuali catture
 		if(state.getTurn().equalsTurn("W"))
 		{
-			state = this.checkCaptureBlack(state, a);
+			this.checkCaptureBlack(state, a);
 		}
 		if(state.getTurn().equalsTurn("B"))
 		{
-			state = this.checkCaptureWhite(state, a);
+			this.checkCaptureWhite(state, a);
 		}
 		
-		this.loggGame.fine("Stato: "+state.toString());
+		this.loggGame.fine("Stato: "+ state);
 		
 		return state;
 	}

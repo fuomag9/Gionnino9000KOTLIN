@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 
 public class TablutRandomWhiteClient {
 	
-	public static void main(String[] args) throws UnknownHostException, ClassNotFoundException, IOException {
+	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		String[] array = new String[]{"WHITE"};
 		if (args.length>0){
 			array = new String[]{"WHITE", args[0]};

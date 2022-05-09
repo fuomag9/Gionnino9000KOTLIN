@@ -1,5 +1,6 @@
 package it.unibo.ai.didattica.competition.tablut.domain;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -12,6 +13,7 @@ import java.io.Serializable;
  */
 public class StateTablut extends State implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	public StateTablut() {
@@ -58,16 +60,15 @@ public class StateTablut extends State implements Serializable {
 
 	}
 
-	public StateTablut clone() {
+	public StateTablut clone() throws CloneNotSupportedException {
+		StateTablut stateTablut = (StateTablut) super.clone();
 		StateTablut result = new StateTablut();
 
-		Pawn oldboard[][] = this.getBoard();
-		Pawn newboard[][] = result.getBoard();
+		Pawn[][] oldboard = this.getBoard();
+		Pawn[][] newboard = result.getBoard();
 
 		for (int i = 0; i < this.board.length; i++) {
-			for (int j = 0; j < this.board[i].length; j++) {
-				newboard[i][j] = oldboard[i][j];
-			}
+			System.arraycopy(oldboard[i], 0, newboard[i], 0, this.board[i].length);
 		}
 
 		result.setBoard(newboard);
@@ -100,9 +101,7 @@ public class StateTablut extends State implements Serializable {
 					if (!this.board[i][j].equals(other.board[i][j]))
 						return false;
 		}
-		if (this.turn != other.turn)
-			return false;
-		return true;
+		return this.turn == other.turn;
 	}
 
 }

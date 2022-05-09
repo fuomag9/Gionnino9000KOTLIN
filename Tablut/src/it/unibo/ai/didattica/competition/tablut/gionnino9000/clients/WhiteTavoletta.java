@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 
 public class WhiteTavoletta {
 
-    public static void main(String[] args) throws UnknownHostException, ClassNotFoundException, IOException {
+    public static void main(String[] args) throws IOException {
         String[] arguments = new String[]{"WHITE", "60", "localhost", "debug"};
 
         if(args.length > 0) {

@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 
 public class BlackTavoletta {
 
-    public static void main(String[] args) throws UnknownHostException, ClassNotFoundException, IOException {
+    public static void main(String[] args) throws IOException {
         String[] arguments = new String[]{"BLACK", "60", "localhost", "debug"};
 
         if(args.length > 0) {

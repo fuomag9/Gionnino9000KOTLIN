@@ -32,7 +32,7 @@ public class Server implements Runnable {
 	/**
 	 * Timeout for waiting for a client to connect
 	 */
-	public static int connectionTimeout = 300;
+	public static final int connectionTimeout = 300;
 
 	/**
 	 * State of the game
@@ -41,38 +41,28 @@ public class Server implements Runnable {
 	/**
 	 * Number of seconds allowed for a decision
 	 */
-	private int time;
+	private final int time;
 	/**
 	 * Number of states kept in memory for the detection of a draw
 	 */
-	private int moveCache;
+	private final int moveCache;
 	/**
 	 * Whether the gui must be enabled or not
 	 */
-	private boolean enableGui;
+	private final boolean enableGui;
 
 	/**
 	 * JSON string used to communicate
 	 */
 	private String theGson;
 	/**
-	 * Action chosen by a player
-	 */
-	private Action move;
-	/**
 	 * Errors allowed
 	 */
-	private int errors;
+	private final int errors;
 	/**
 	 * Repeated positions allowed
 	 */
 	private int repeated;
-
-	private ServerSocket socketWhite;
-	private ServerSocket socketBlack;
-
-	private Socket white;
-	private Socket black;
 
 	/**
 	 * Counter for the errors of the black player
@@ -83,17 +73,17 @@ public class Server implements Runnable {
 	 */
 	private int whiteErrors;
 
-	private int cacheSize;
+	private final int cacheSize;
 
 	private Game game;
-	private Gson gson;
+	private final Gson gson;
 	private Gui theGui;
 	/**
 	 * Integer that represents the game type
 	 */
-	private int gameC;
+	private final int gameC;
 
-	public Server(int timeout, int cacheSize, int numErrors, int repeated, int game, boolean gui) {
+	public Server(int timeout, int cacheSize, int numErrors, int game, boolean gui) {
 		this.gameC = game;
 		this.enableGui = gui;
 		this.time = timeout;
@@ -205,18 +195,14 @@ public class Server implements Runnable {
 				}
 			}
 
-			if(cmd.hasOption("g")){
-				enableGui=true;
-			}else{
-				enableGui=false;
-			}
+			enableGui= cmd.hasOption("g");
 
 		}catch (ParseException exp){
 			System.out.println( "Unexpected exception:" + exp.getMessage() );
 		}
 
 		// Start the server
-		Server engine = new Server(time, moveCache, errors, repeated, gameChosen, enableGui);
+		Server engine = new Server(time, moveCache, errors, gameChosen, enableGui);
 		engine.run();
 	}
 
@@ -228,7 +214,7 @@ public class Server implements Runnable {
 	 *
 	 */
 	private class TCPInput implements Runnable {
-		private DataInputStream theStream;
+		private final DataInputStream theStream;
 
 		public TCPInput(DataInputStream theS) {
 			this.theStream = theS;
@@ -239,6 +225,7 @@ public class Server implements Runnable {
 				theGson = StreamUtils.readString(this.theStream);
 
 			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -248,8 +235,8 @@ public class Server implements Runnable {
 	 * @author Andrea Galassi
 	 *
 	 */
-	private class TCPConnection implements Runnable {
-		private ServerSocket serversocket;
+	private static class TCPConnection implements Runnable {
+		private final ServerSocket serversocket;
 		private Socket socket;
 
 		public TCPConnection(ServerSocket serverSocket) {
@@ -260,6 +247,7 @@ public class Server implements Runnable {
 			try {
 				socket = serversocket.accept();
 			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 		}
 
@@ -274,17 +262,8 @@ public class Server implements Runnable {
 	 * interrupts games that last too much
 	 */
 	public void run() {
-		/**
-		 * Number of hours that a game can last before the timeout
-		 */
 		int hourlimit = 10;
-		/**
-		 * Endgame state reached?
-		 */
 		boolean endgame = false;
-		/**
-		 * Name of the systemlog
-		 */
 		String logs_folder = "logs";
 		Path p = Paths.get(logs_folder + File.separator + new Date().getTime() + "_systemLog.txt");
 		p = p.toAbsolutePath();
@@ -297,7 +276,7 @@ public class Server implements Runnable {
 			if (!systemLog.exists()) {
 				systemLog.createNewFile();
 			}
-			FileHandler fh = null;
+			FileHandler fh;
 			fh = new FileHandler(sysLogName, true);
 			loggSys.addHandler(fh);
 			fh.setFormatter(new SimpleFormatter());
@@ -309,59 +288,37 @@ public class Server implements Runnable {
 		}
 
 		switch (this.gameC) {
-		case 1:
-			loggSys.fine("Partita di ClassicTablut");
-			break;
-		case 2:
-			loggSys.fine("Partita di ModernTablut");
-			break;
-		case 3:
-			loggSys.fine("Partita di Brandub");
-			break;
-		case 4:
-			loggSys.fine("Partita di Tablut");
-			break;
-		default:
-			System.out.println("Error in game selection");
-			System.exit(4);
+			case 1 -> loggSys.fine("Partita di ClassicTablut");
+			case 2 -> loggSys.fine("Partita di ModernTablut");
+			case 3 -> loggSys.fine("Partita di Brandub");
+			case 4 -> loggSys.fine("Partita di Tablut");
+			default -> {
+				System.out.println("Error in game selection");
+				System.exit(4);
+			}
 		}
 
 		Date starttime = new Date();
 		Thread t;
 
-		/**
-		 * Channel to receive the move of the white player
-		 */
-		DataInputStream whiteMove = null;
-		/**
-		 * Channel to receive the move of the black player
-		 */
-		DataInputStream blackMove = null;
-		/**
-		 * Channel to send the state to the white player
-		 */
+		DataInputStream whiteMove;
+		DataInputStream blackMove;
 		DataOutputStream whiteState = null;
-		/**
-		 * Channel to send the state to the black player
-		 */
 		DataOutputStream blackState = null;
 		System.out.println("Waiting for connections...");
 
 		String whiteName = "WP";
 		String blackName = "BP";
 
-		/**
-		 * Socket of the current player
-		 */
-		TCPInput tin = null;
+		TCPInput tin;
 		TCPInput Turnwhite = null;
 		TCPInput Turnblack = null;
-		TCPConnection tc = null;
+		TCPConnection tc;
 
 		// ESTABLISH CONNECTIONS AND NAME READING
 		try {
-			this.socketWhite = new ServerSocket(Configuration.whitePort);
-			this.socketBlack = new ServerSocket(Configuration.blackPort);
+			ServerSocket socketWhite = new ServerSocket(Configuration.whitePort);
+			ServerSocket socketBlack = new ServerSocket(Configuration.blackPort);
 			
 
 			// ESTABLISHING CONNECTION
@@ -384,8 +341,8 @@ public class Server implements Runnable {
 				loggSys.warning("Closing system for timeout!");
 				System.exit(0);
 			}
-			
-			white = tc.getSocket();
+
+			Socket white = tc.getSocket();
 			loggSys.fine("White player connected");
 			whiteMove = new DataInputStream(white.getInputStream());
 			whiteState = new DataOutputStream(white.getOutputStream());
@@ -413,13 +370,13 @@ public class Server implements Runnable {
 
 			whiteName = this.gson.fromJson(theGson, String.class);
 			// SECURITY STEP: dropping unproper characters
-			String temp = "";
+			StringBuilder temp = new StringBuilder();
 			for (int i = 0; i < whiteName.length() && i < 10; i++) {
 				char c = whiteName.charAt(i);
 				if (Character.isAlphabetic(c) || Character.isDigit(c))
-					temp += c;
+					temp.append(c);
 			}
-			whiteName = temp;
+			whiteName = temp.toString();
 			System.out.println("White player name:\t" + whiteName);
 			loggSys.fine("White player name:\t" + whiteName);
 
@@ -444,7 +401,7 @@ public class Server implements Runnable {
 				loggSys.warning("Closing system for timeout!");
 				System.exit(0);
 			}
-			black = tc.getSocket();
+			Socket black = tc.getSocket();
 			loggSys.fine("Accettata connessione con client giocatore Nero");
 			blackMove = new DataInputStream(black.getInputStream());
 			blackState = new DataOutputStream(black.getOutputStream());
@@ -473,15 +430,15 @@ public class Server implements Runnable {
 
 			blackName = this.gson.fromJson(theGson, String.class);
 			// SECURITY STEP: dropping unproper characters
-			temp = "";
+			temp = new StringBuilder();
 			for (int i = 0; i < blackName.length() && i < 10; i++) {
 				char c = blackName.charAt(i);
 				if (Character.isAlphabetic(c) || Character.isDigit(c))
-					temp += c;
+					temp.append(c);
 			}
 			System.out.println("Black player name:\t" + blackName);
 			loggSys.fine("Black player name:\t" + blackName);
-			blackName = temp;
+			blackName = temp.toString();
 
 		} catch (IOException e) {
 			System.out.println("Socket error....");
@@ -491,26 +448,27 @@ public class Server implements Runnable {
 		}
 
 		switch (this.gameC) {
-		case 1:
-			state = new StateTablut();
-			this.game = new GameTablut(moveCache);
-			break;
-		case 2:
-			state = new StateTablut();
-			this.game = new GameModernTablut(moveCache);
-			break;
-		case 3:
-			state = new StateBrandub();
-			this.game = new GameTablut(moveCache);
-			break;
-		case 4:
-			state = new StateTablut();
-			state.setTurn(State.Turn.WHITE);
-			this.game = new GameAshtonTablut(state, repeated, this.cacheSize, "logs", whiteName, blackName);
-			break;
-		default:
-			System.out.println("Error in game selection");
-			System.exit(4);
+			case 1 -> {
+				state = new StateTablut();
+				this.game = new GameTablut(moveCache);
+			}
+			case 2 -> {
+				state = new StateTablut();
+				this.game = new GameModernTablut(moveCache);
+			}
+			case 3 -> {
+				state = new StateBrandub();
+				this.game = new GameTablut(moveCache);
+			}
+			case 4 -> {
+				state = new StateTablut();
+				state.setTurn(Turn.WHITE);
+				this.game = new GameAshtonTablut(state, repeated, this.cacheSize, "logs", whiteName, blackName);
+			}
+			default -> {
+				System.out.println("Error in game selection");
+				System.exit(4);
+			}
 		}
 		if (this.enableGui) {
 			this.initializeGUI(state);
@@ -567,7 +525,10 @@ public class Server implements Runnable {
 
 			// APPLY MOVE
 			// translate the string into an action object
-			move = this.gson.fromJson(theGson, Action.class);
+			/**
+			 * Action chosen by a player
+			 */
+			Action move = this.gson.fromJson(theGson, Action.class);
 			loggSys.fine("Move received.\t" + move.toString());
 			move.setTurn(state.getTurn());
 			System.out.println("Suggested move: " + move.toString());
@@ -636,33 +597,30 @@ public class Server implements Runnable {
 
 
 			switch (state.getTurn()) {
-			case WHITE:
-				tin = Turnwhite;
-				break;
-			case BLACK:
-				tin = Turnblack;
-				break;
-			case BLACKWIN:
-				this.game.endGame(state);
-				System.out.println("END OF THE GAME");
-				System.out.println("RESULT: PLAYER BLACK WIN");
-				endgame = true;
-				break;
-			case WHITEWIN:
-				this.game.endGame(state);
-				System.out.println("END OF THE GAME");
-				System.out.println("RESULT: PLAYER WHITE WIN");
-				endgame = true;
-				break;
-			case DRAW:
-				this.game.endGame(state);
-				System.out.println("END OF THE GAME");
-				System.out.println("RESULT: DRAW");
-				endgame = true;
-				break;
-			default:
-				loggSys.warning("Chiusura sistema");
-				System.exit(4);
+				case WHITE -> tin = Turnwhite;
+				case BLACK -> tin = Turnblack;
+				case BLACKWIN -> {
+					this.game.endGame(state);
+					System.out.println("END OF THE GAME");
+					System.out.println("RESULT: PLAYER BLACK WIN");
+					endgame = true;
+				}
+				case WHITEWIN -> {
+					this.game.endGame(state);
+					System.out.println("END OF THE GAME");
+					System.out.println("RESULT: PLAYER WHITE WIN");
+					endgame = true;
+				}
+				case DRAW -> {
+					this.game.endGame(state);
+					System.out.println("END OF THE GAME");
+					System.out.println("RESULT: DRAW");
+					endgame = true;
+				}
+				default -> {
+					loggSys.warning("Chiusura sistema");
+					System.exit(4);
+				}
 			}
 
 		}
