@@ -19,6 +19,7 @@ import java.util.logging.FileHandler
 import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.logging.SimpleFormatter
+import kotlin.system.exitProcess
 
 /**
  * this class represent the server of the match: 2 clients with TCP connection
@@ -135,15 +136,14 @@ class Server(
             if (!systemLog.exists()) {
                 systemLog.createNewFile()
             }
-            val fh: FileHandler
-            fh = FileHandler(sysLogName, true)
+            val fh: FileHandler = FileHandler(sysLogName, true)
             loggSys.addHandler(fh)
             fh.formatter = SimpleFormatter()
             loggSys.level = Level.FINE
             loggSys.fine("Accensione server")
         } catch (e: Exception) {
             e.printStackTrace()
-            System.exit(1)
+            exitProcess(1)
         }
         when (gameC) {
             1 -> loggSys.fine("Partita di ClassicTablut")
@@ -152,7 +152,7 @@ class Server(
             4 -> loggSys.fine("Partita di Tablut")
             else -> {
                 println("Error in game selection")
-                System.exit(4)
+                exitProcess(4)
             }
         }
         val starttime = Date()
@@ -193,7 +193,7 @@ class Server(
             if (t.isAlive) {
                 println("Timeout!!!!")
                 loggSys.warning("Closing system for timeout!")
-                System.exit(0)
+                exitProcess(0)
             }
             val white: Socket? = tc.socket
             loggSys.fine("White player connected")
@@ -218,7 +218,7 @@ class Server(
             if (t.isAlive) {
                 println("Timeout!!!!")
                 loggSys.warning("Chiusura sistema per timeout")
-                System.exit(0)
+                exitProcess(0)
             }
             whiteName = gson.fromJson(theGson, String::class.java)
             // SECURITY STEP: dropping unproper characters
@@ -254,7 +254,7 @@ class Server(
             if (t.isAlive) {
                 println("Timeout!!!!")
                 loggSys.warning("Closing system for timeout!")
-                System.exit(0)
+                exitProcess(0)
             }
             val black: Socket? = tc.socket
             loggSys.fine("Accettata connessione con client giocatore Nero")
@@ -280,7 +280,7 @@ class Server(
             if (t.isAlive) {
                 println("Timeout!!!!")
                 loggSys.warning("Chiusura sistema per timeout")
-                System.exit(0)
+                exitProcess(0)
             }
             blackName = gson.fromJson(theGson, String::class.java)
             // SECURITY STEP: dropping unproper characters
@@ -298,7 +298,7 @@ class Server(
             println("Socket error....")
             loggSys.warning("Errore connessioni")
             loggSys.warning("Chiusura sistema")
-            System.exit(1)
+            exitProcess(1)
         }
         when (gameC) {
             1 -> {
@@ -320,7 +320,7 @@ class Server(
             }
             else -> {
                 println("Error in game selection")
-                System.exit(4)
+                exitProcess(4)
             }
         }
         if (enableGui) {
@@ -342,7 +342,7 @@ class Server(
             e.printStackTrace()
             loggSys.fine("Errore invio messaggio ai giocatori")
             loggSys.warning("Chiusura sistema")
-            System.exit(1)
+            exitProcess(1)
         }
 
         // GAME CYCLE
@@ -372,7 +372,7 @@ class Server(
                 println("Player " + state!!.turn.toString() + " has lost!")
                 loggSys.warning("Timeout! Player " + state!!.turn + " lose!")
                 loggSys.warning("Chiusura sistema per timeout")
-                System.exit(0)
+                exitProcess(0)
             }
 
             // APPLY MOVE
@@ -442,7 +442,7 @@ class Server(
                 e.printStackTrace()
                 loggSys.warning("Errore invio messaggio ai client")
                 loggSys.warning("Chiusura sistema")
-                System.exit(1)
+                exitProcess(1)
             }
             when (state?.turn) {
                 Turn.WHITE -> tin = Turnwhite
@@ -467,11 +467,11 @@ class Server(
                 }
                 else -> {
                     loggSys.warning("Chiusura sistema")
-                    System.exit(4)
+                    exitProcess(4)
                 }
             }
         }
-        System.exit(0)
+        exitProcess(0)
     }
 
     companion object {
@@ -525,12 +525,12 @@ class Server(
                         if (time < 1) {
                             println("Time format not allowed!")
                             formatter.printHelp("java Server", options)
-                            System.exit(1)
+                            exitProcess(1)
                         }
                     } catch (e: NumberFormatException) {
                         println("The time format is not correct!")
                         formatter.printHelp("java Server", options)
-                        System.exit(1)
+                        exitProcess(1)
                     }
                 }
                 if (cmd.hasOption("c")) {
@@ -540,7 +540,7 @@ class Server(
                     } catch (e: NumberFormatException) {
                         println("Number format is not correct!")
                         formatter.printHelp("java Server", options)
-                        System.exit(1)
+                        exitProcess(1)
                     }
                 }
                 if (cmd.hasOption("e")) {
@@ -549,7 +549,7 @@ class Server(
                     } catch (e: NumberFormatException) {
                         println("The error format is not correct!")
                         formatter.printHelp("java Server", options)
-                        System.exit(1)
+                        exitProcess(1)
                     }
                 }
                 if (cmd.hasOption("s")) {
@@ -558,12 +558,12 @@ class Server(
                         if (repeated < 0) {
                             println("he RepeatedStates value is not allowed!")
                             formatter.printHelp("java Server", options)
-                            System.exit(1)
+                            exitProcess(1)
                         }
                     } catch (e: NumberFormatException) {
                         println("The RepeatedStates format is not correct!")
                         formatter.printHelp("java Server", options)
-                        System.exit(1)
+                        exitProcess(1)
                     }
                 }
                 if (cmd.hasOption("r")) {
@@ -572,12 +572,12 @@ class Server(
                         if (gameChosen < 0 || gameChosen > 4) {
                             println("Game format not allowed!")
                             formatter.printHelp("java Server", options)
-                            System.exit(1)
+                            exitProcess(1)
                         }
                     } catch (e: NumberFormatException) {
                         println("The game format is not correct!")
                         formatter.printHelp("java Server", options)
-                        System.exit(1)
+                        exitProcess(1)
                     }
                 }
                 enableGui = cmd.hasOption("g")

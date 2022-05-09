@@ -2,6 +2,7 @@ package it.unibo.ai.didattica.competition.tablut.gui
 
 import it.unibo.ai.didattica.competition.tablut.domain.State
 import javax.swing.JFrame
+import kotlin.system.exitProcess
 
 /**
  *
@@ -9,7 +10,7 @@ import javax.swing.JFrame
  * @author A.Piretti
  */
 class Gui(private val game: Int) {
-    var frame: Background? = null
+    private var frame: Background? = null
 
     init {
         initGUI()
@@ -42,7 +43,7 @@ class Gui(private val game: Int) {
             }
             else -> {
                 println("Error in GUI init")
-                System.exit(4)
+                exitProcess(4)
             }
         }
     }
@@ -74,7 +75,7 @@ class Gui(private val game: Int) {
             }
             else -> {
                 println("Error in GUI show")
-                System.exit(4)
+                exitProcess(4)
             }
         }
     }

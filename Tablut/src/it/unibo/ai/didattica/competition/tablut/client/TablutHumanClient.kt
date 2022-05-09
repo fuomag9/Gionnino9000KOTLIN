@@ -5,6 +5,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Turn
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import kotlin.system.exitProcess
 
 /**
  *
@@ -41,17 +42,17 @@ class TablutHumanClient(player: String) : TablutClient(player, "humanInterface")
                         println("Waiting for your opponent move... ")
                     } else if (currentState?.turn == Turn.WHITEWIN) {
                         println("YOU WIN!")
-                        System.exit(0)
+                        exitProcess(0)
                     } else if (currentState?.turn == Turn.BLACKWIN) {
                         println("YOU LOSE!")
-                        System.exit(0)
+                        exitProcess(0)
                     } else if (currentState?.turn == Turn.DRAW) {
                         println("DRAW!")
-                        System.exit(0)
+                        exitProcess(0)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    System.exit(1)
+                    exitProcess(1)
                 }
             }
         } else {
@@ -73,17 +74,17 @@ class TablutHumanClient(player: String) : TablutClient(player, "humanInterface")
                         println("Waiting for your opponent move... ")
                     } else if (currentState?.turn == Turn.WHITEWIN) {
                         println("YOU LOSE!")
-                        System.exit(0)
+                        exitProcess(0)
                     } else if (currentState?.turn == Turn.BLACKWIN) {
                         println("YOU WIN!")
-                        System.exit(0)
+                        exitProcess(0)
                     } else if (currentState?.turn == Turn.DRAW) {
                         println("DRAW!")
-                        System.exit(0)
+                        exitProcess(0)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    System.exit(1)
+                    exitProcess(1)
                 }
             }
         }
@@ -93,9 +94,9 @@ class TablutHumanClient(player: String) : TablutClient(player, "humanInterface")
         @Throws(IOException::class)
         @JvmStatic
         fun main(args: Array<String>) {
-            if (args.size == 0) {
+            if (args.isEmpty()) {
                 println("You must specify which player you are (WHITE or BLACK)!")
-                System.exit(-1)
+                exitProcess(-1)
             }
             println("Selected this: " + args[0])
             val client: TablutClient = TablutHumanClient(args[0])

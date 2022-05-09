@@ -93,7 +93,7 @@ abstract class Heuristics(protected val state: State?) {
     /**
      * @return true if a camp is adjacent to pos
      */
-    fun checkAdjacentCamp(pos: IntArray): Boolean {
+    private fun checkAdjacentCamp(pos: IntArray): Boolean {
         if (Arrays.stream(camps)
                 .anyMatch { camp: IntArray? -> Arrays.equals(camp, intArrayOf(pos[0] - 1, pos[1])) }
         ) return true
@@ -114,8 +114,8 @@ abstract class Heuristics(protected val state: State?) {
     /**
      * @return true if king is on a center tile
      */
-    fun isKingOnCenter(kingPosition: IntArray): Boolean {
-        return kingPosition[0] > 2 && kingPosition[0] < 6 && kingPosition[1] > 2 && kingPosition[1] < 6
+    private fun isKingOnCenter(kingPosition: IntArray): Boolean {
+        return kingPosition[0] in 3..5 && kingPosition[1] > 2 && kingPosition[1] < 6
     }
 
     /**
@@ -124,7 +124,7 @@ abstract class Heuristics(protected val state: State?) {
     fun getKingEscapes(state: State?, kingPosition: IntArray): IntArray {
         val escapes = IntArray(4)
         if (!isKingOnCenter(kingPosition)) {
-            if (!(kingPosition[1] > 2 && kingPosition[1] < 6) && !(kingPosition[0] > 2 && kingPosition[0] < 6)) {
+            if (!(kingPosition[1] in 3..5) && !(kingPosition[0] in 3..5)) {
                 val tempV = countFreeColumn(state, kingPosition)
                 val tempH = countFreeRow(state, kingPosition)
                 escapes[0] = tempV[0]
@@ -132,12 +132,12 @@ abstract class Heuristics(protected val state: State?) {
                 escapes[2] = tempH[0]
                 escapes[3] = tempH[1]
             }
-            if (kingPosition[1] > 2 && kingPosition[1] < 6) {
+            if (kingPosition[1] in 3..5) {
                 val tempH = countFreeRow(state, kingPosition)
                 escapes[2] = tempH[0]
                 escapes[3] = tempH[1]
             }
-            if (kingPosition[0] > 2 && kingPosition[0] < 6) {
+            if (kingPosition[0] in 3..5) {
                 val tempV = countFreeColumn(state, kingPosition)
                 escapes[0] = tempV[0]
                 escapes[1] = tempV[1]
@@ -150,7 +150,7 @@ abstract class Heuristics(protected val state: State?) {
     /**
      * @return free rows from given position [ left, right ]
      */
-    fun countFreeRow(state: State?, position: IntArray): IntArray {
+    private fun countFreeRow(state: State?, position: IntArray): IntArray {
         val row = position[0]
         val column = position[1]
         val currentPosition = IntArray(2)
@@ -185,7 +185,7 @@ abstract class Heuristics(protected val state: State?) {
     /**
      * @return number of free columns from given position [ up, down ]
      */
-    fun countFreeColumn(state: State?, position: IntArray): IntArray {
+    private fun countFreeColumn(state: State?, position: IntArray): IntArray {
         val row = position[0]
         val column = position[1]
         val currentPosition = IntArray(2)
@@ -220,7 +220,7 @@ abstract class Heuristics(protected val state: State?) {
     /**
      * @return true if a position is occupied, false otherwise
      */
-    fun isPositionOccupied(state: State?, position: IntArray): Boolean {
+    private fun isPositionOccupied(state: State?, position: IntArray): Boolean {
         return state!!.getPawn(position[0], position[1]) != Pawn.EMPTY
     }
 

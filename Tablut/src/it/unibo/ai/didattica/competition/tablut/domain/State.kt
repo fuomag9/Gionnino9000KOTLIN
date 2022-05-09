@@ -49,7 +49,7 @@ abstract class State {
 
     var board: Array<Array<Pawn?>?>? = null
     var turn: Turn? = null
-    fun boardString(): String {
+    private fun boardString(): String {
         val result = StringBuilder()
         for (pawns in board!!) {
             for (j in board!!.indices) {

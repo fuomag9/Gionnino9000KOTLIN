@@ -7,7 +7,7 @@ object BlackTavoletta {
     @JvmStatic
     fun main(args: Array<String>) {
         var arguments = arrayOf("BLACK", "60", "localhost", "debug")
-        if (args.size > 0) {
+        if (args.isNotEmpty()) {
             arguments = arrayOf("BLACK", args[0])
         }
         Tavoletta.main(arguments)

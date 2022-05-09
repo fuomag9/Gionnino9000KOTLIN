@@ -9,6 +9,7 @@ import java.util.logging.FileHandler
 import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.logging.SimpleFormatter
+import kotlin.system.exitProcess
 
 /**
  *
@@ -18,7 +19,7 @@ import java.util.logging.SimpleFormatter
  */
 class GameTablut @JvmOverloads constructor(private val movesDraw: Int = 0) : Game {
     private var movesWithutCapturing = 0
-    var gameLog: File? = null
+    private var gameLog: File? = null
     private val loggGame: Logger
 
     init {
@@ -29,7 +30,7 @@ class GameTablut @JvmOverloads constructor(private val movesDraw: Int = 0) : Gam
             fh = FileHandler(gameLogName, true)
         } catch (e: Exception) {
             e.printStackTrace()
-            System.exit(1)
+            exitProcess(1)
         }
         loggGame = Logger.getLogger("GameLog")
         loggGame.addHandler(fh)
@@ -197,21 +198,21 @@ class GameTablut @JvmOverloads constructor(private val movesDraw: Int = 0) : Gam
         //libero il trono o una casella qualunque
         if (newBoard!!.size == 9) {
             if (a.columnFrom == 4 && a.rowFrom == 4) {
-                newBoard!![a.rowFrom]!![a.columnFrom] = Pawn.THRONE
+                newBoard[a.rowFrom]!![a.columnFrom] = Pawn.THRONE
             } else {
-                newBoard!![a.rowFrom]!![a.columnFrom] = Pawn.EMPTY
+                newBoard[a.rowFrom]!![a.columnFrom] = Pawn.EMPTY
             }
         }
-        if (newBoard!!.size == 7) {
+        if (newBoard.size == 7) {
             if (a.columnFrom == 3 && a.rowFrom == 3) {
-                newBoard!![a.rowFrom]!![a.columnFrom] = Pawn.THRONE
+                newBoard[a.rowFrom]!![a.columnFrom] = Pawn.THRONE
             } else {
-                newBoard!![a.rowFrom]!![a.columnFrom] = Pawn.EMPTY
+                newBoard[a.rowFrom]!![a.columnFrom] = Pawn.EMPTY
             }
         }
 
         //metto nel nuovo tabellone la pedina mossa
-        newBoard!![a.rowTo]!![a.columnTo] = pawn
+        newBoard[a.rowTo]!![a.columnTo] = pawn
         //aggiorno il tabellone
         state.board=(newBoard)
         //cambio il turno
@@ -232,7 +233,7 @@ class GameTablut @JvmOverloads constructor(private val movesDraw: Int = 0) : Gam
     private fun checkCaptureWhite(state: State?, a: Action): State? {
         //controllo se mangio a destra
         if (state != null) {
-            if (a.columnTo < state.board!!.size - 2 && state!!.getPawn(a.rowTo, a.columnTo + 1)!!
+            if (a.columnTo < state.board!!.size - 2 && state.getPawn(a.rowTo, a.columnTo + 1)!!
                     .equalsPawn("B") && (state.getPawn(a.rowTo, a.columnTo + 2)!!.equalsPawn("W") || state.getPawn(
                     a.rowTo,
                     a.columnTo + 2
@@ -274,7 +275,7 @@ class GameTablut @JvmOverloads constructor(private val movesDraw: Int = 0) : Gam
         }
         //controllo se mangio sotto
         if (state != null) {
-            if (a.rowTo < state.board!!.size - 2 && state!!.getPawn(a.rowTo + 1, a.columnTo)!!
+            if (a.rowTo < state.board!!.size - 2 && state.getPawn(a.rowTo + 1, a.columnTo)!!
                     .equalsPawn("B") && (state.getPawn(a.rowTo + 2, a.columnTo)!!
                     .equalsPawn("W") || state.getPawn(a.rowTo + 2, a.columnTo)!!
                     .equalsPawn("T") || state.getPawn(a.rowTo + 2, a.columnTo)!!.equalsPawn("K"))
@@ -287,7 +288,7 @@ class GameTablut @JvmOverloads constructor(private val movesDraw: Int = 0) : Gam
         //controllo se ho vinto
         if (state != null) {
             if (a.rowTo == 0 || a.rowTo == state.board!!.size - 1 || a.columnTo == 0 || a.columnTo == state.board!!.size - 1) {
-                if (state!!.getPawn(a.rowTo, a.columnTo)!!.equalsPawn("K")) {
+                if (state.getPawn(a.rowTo, a.columnTo)!!.equalsPawn("K")) {
                     state.turn=(Turn.WHITEWIN)
                     loggGame.fine("Bianco vince con re in " + a.to)
                 }
@@ -314,7 +315,7 @@ class GameTablut @JvmOverloads constructor(private val movesDraw: Int = 0) : Gam
     private fun checkCaptureBlack(state: State?, a: Action): State {
         //controllo se mangio a destra
         if (state != null) {
-            if (a.columnTo < state.board!!.size - 2 && (state!!.getPawn(a.rowTo, a.columnTo + 1)!!
+            if (a.columnTo < state.board!!.size - 2 && (state.getPawn(a.rowTo, a.columnTo + 1)!!
                     .equalsPawn("W") || state.getPawn(a.rowTo, a.columnTo + 1)!!.equalsPawn("K")) && (state.getPawn(
                     a.rowTo,
                     a.columnTo + 2
@@ -518,7 +519,7 @@ class GameTablut @JvmOverloads constructor(private val movesDraw: Int = 0) : Gam
         }
         //controllo se mangio sotto
         if (state != null) {
-            if (a.rowTo < state.board!!.size - 2 && (state!!.getPawn(a.rowTo + 1, a.columnTo)!!
+            if (a.rowTo < state.board!!.size - 2 && (state.getPawn(a.rowTo + 1, a.columnTo)!!
                     .equalsPawn("W") || state.getPawn(a.rowTo + 1, a.columnTo)!!
                     .equalsPawn("K")) && (state.getPawn(a.rowTo + 2, a.columnTo)!!
                     .equalsPawn("B") || state.getPawn(a.rowTo + 2, a.columnTo)!!.equalsPawn("T"))

@@ -7,7 +7,7 @@ object TablutRandomBlackClient {
     @JvmStatic
     fun main(args: Array<String>) {
         var array = arrayOf("BLACK")
-        if (args.size > 0) {
+        if (args.isNotEmpty()) {
             array = arrayOf("BLACK", args[0])
         }
         TablutRandomClient.main(array)

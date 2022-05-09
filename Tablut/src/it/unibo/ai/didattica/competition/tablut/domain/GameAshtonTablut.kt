@@ -11,6 +11,7 @@ import java.util.logging.FileHandler
 import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.logging.SimpleFormatter
+import kotlin.system.exitProcess
 
 /**
  * Game engine inspired by the Ashton Rules of Tablut
@@ -22,20 +23,20 @@ class GameAshtonTablut(
     /**
      * Number of repeated states that can occur before a draw
      */
-    val repeated_moves_allowed: Int,
+    private val repeated_moves_allowed: Int,
     /**
      * Number of states kept in memory. negative value means infinite.
      */
-    val cache_size: Int, logs_folder: String,
+    private val cache_size: Int, logs_folder: String,
     whiteName: String, blackName: String
 ) : Game, Cloneable, aima.core.search.adversarial.Game<State?, Action, Turn?> {
 
     /**
      * Counter for the moves without capturing that have occurred
      */
-    var movesWithutCapturing = 0
+    private var movesWithutCapturing = 0
         private set
-    var gameLog: File? = null
+    private var gameLog: File? = null
     private var fh: FileHandler? = null
     private val loggGame: Logger
     private val citadels: MutableList<String?>
@@ -70,7 +71,7 @@ class GameAshtonTablut(
             fh = FileHandler(gameLogName, true)
         } catch (e: Exception) {
             e.printStackTrace()
-            System.exit(1)
+            exitProcess(1)
         }
         loggGame = Logger.getLogger("GameLog")
         loggGame.useParentHandlers = false
@@ -288,7 +289,7 @@ class GameAshtonTablut(
     private fun checkCaptureBlackKingRight(state: State, a: Action) {
         // ho il re sulla destra
         if (a.columnTo < state.board!!.size - 2
-            && state!!.getPawn(a.rowTo, a.columnTo + 1)!!.equalsPawn("K")
+            && state.getPawn(a.rowTo, a.columnTo + 1)!!.equalsPawn("K")
         ) {
             //System.out.println("Ho il re sulla destra");
             // re sul trono
@@ -344,7 +345,7 @@ class GameAshtonTablut(
         // ho il re sotto
         if (state != null) {
             if (a.rowTo < state.board!!.size - 2
-                && state!!.getPawn(a.rowTo + 1, a.columnTo)!!.equalsPawn("K")
+                && state.getPawn(a.rowTo + 1, a.columnTo)!!.equalsPawn("K")
             ) {
                 //System.out.println("Ho il re sotto");
                 // re sul trono
@@ -453,7 +454,7 @@ class GameAshtonTablut(
     private fun checkCaptureBlackPawnRight(state: State, a: Action) {
         // mangio a destra
         if (a.columnTo < state.board!!.size - 2
-            && state!!.getPawn(a.rowTo, a.columnTo + 1)!!.equalsPawn("W")
+            && state.getPawn(a.rowTo, a.columnTo + 1)!!.equalsPawn("W")
         ) {
             if (state.getPawn(a.rowTo, a.columnTo + 2)!!.equalsPawn("B")) {
                 state.removePawn(a.rowTo, a.columnTo + 1)
@@ -485,9 +486,9 @@ class GameAshtonTablut(
                     || state.getPawn(a.rowTo, a.columnTo - 2)!!.equalsPawn("T")
                     || this.citadels.contains(state.getBox(a.rowTo, a.columnTo - 2))
                     || (state.getBox(a.rowTo, a.columnTo - 2) == "e5"))) {
-            state.removePawn(a.rowTo, a.columnTo - 1);
-            this.movesWithutCapturing = -1;
-            this.loggGame.fine("Pedina bianca rimossa in: " + state.getBox(a.rowTo, a.columnTo - 1));
+            state.removePawn(a.rowTo, a.columnTo - 1)
+            this.movesWithutCapturing = -1
+            this.loggGame.fine("Pedina bianca rimossa in: " + state.getBox(a.rowTo, a.columnTo - 1))
         }
     }
 
@@ -498,9 +499,9 @@ class GameAshtonTablut(
                     || state.getPawn(a.rowTo - 2, a.columnTo)!!.equalsPawn("T")
                     || this.citadels.contains(state.getBox(a.rowTo - 2, a.columnTo))
                     || (state.getBox(a.rowTo - 2, a.columnTo) == "e5"))) {
-            state.removePawn(a.rowTo - 1, a.columnTo);
-            this.movesWithutCapturing = -1;
-            this.loggGame.fine("Pedina bianca rimossa in: " + state.getBox(a.rowTo - 1, a.columnTo));
+            state.removePawn(a.rowTo - 1, a.columnTo)
+            this.movesWithutCapturing = -1
+            this.loggGame.fine("Pedina bianca rimossa in: " + state.getBox(a.rowTo - 1, a.columnTo))
         }
     }
 
@@ -512,13 +513,13 @@ class GameAshtonTablut(
                     || state.getPawn(a.rowTo + 2, a.columnTo)!!.equalsPawn("T")
                     || this.citadels.contains(state.getBox(a.rowTo + 2, a.columnTo))
                     || (state.getBox(a.rowTo + 2, a.columnTo) == "e5"))) {
-            state.removePawn(a.rowTo + 1, a.columnTo);
-            this.movesWithutCapturing = -1;
-            this.loggGame.fine("Pedina bianca rimossa in: " + state.getBox(a.rowTo + 1, a.columnTo));
+            state.removePawn(a.rowTo + 1, a.columnTo)
+            this.movesWithutCapturing = -1
+            this.loggGame.fine("Pedina bianca rimossa in: " + state.getBox(a.rowTo + 1, a.columnTo))
         }
     }
 
-    private fun checkCaptureBlack(state: State, a: Action): State? {
+    private fun checkCaptureBlack(state: State, a: Action): State {
         checkCaptureBlackPawnRight(state, a)
         checkCaptureBlackPawnLeft(state, a)
         checkCaptureBlackPawnUp(state, a)

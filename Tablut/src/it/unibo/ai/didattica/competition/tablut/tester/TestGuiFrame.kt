@@ -9,6 +9,7 @@ import java.awt.GridLayout
 import java.awt.Label
 import java.io.Serial
 import javax.swing.*
+import kotlin.system.exitProcess
 
 class TestGuiFrame(game: Int) : JFrame() {
     var state: State? = null
@@ -67,7 +68,7 @@ class TestGuiFrame(game: Int) : JFrame() {
             }
             else -> {
                 println("Error in game selection")
-                System.exit(4)
+                exitProcess(4)
             }
         }
         val theGui = Gui(game)

@@ -172,7 +172,7 @@ class GameModernTablut @JvmOverloads constructor(private val movesDraw: Int = 0)
     private fun checkCaptureWhite(state: State?, a: Action): State? {
         // controllo se mangio a destra
         if (state != null) {
-            if (a.columnTo < state.board!!.size - 2 && state!!.getPawn(a.rowTo, a.columnTo + 1)!!.equalsPawn("B")
+            if (a.columnTo < state.board!!.size - 2 && state.getPawn(a.rowTo, a.columnTo + 1)!!.equalsPawn("B")
                 && (state.getPawn(a.rowTo, a.columnTo + 2)!!.equalsPawn("W")
                         || state.getPawn(a.rowTo, a.columnTo + 2)!!.equalsPawn("T")
                         || state.getPawn(a.rowTo, a.columnTo + 2)!!.equalsPawn("K"))
@@ -207,7 +207,7 @@ class GameModernTablut @JvmOverloads constructor(private val movesDraw: Int = 0)
         }
         // controllo se mangio sotto
         if (state != null) {
-            if (a.rowTo < state.board!!.size - 2 && state!!.getPawn(a.rowTo + 1, a.columnTo)!!.equalsPawn("B")
+            if (a.rowTo < state.board!!.size - 2 && state.getPawn(a.rowTo + 1, a.columnTo)!!.equalsPawn("B")
                 && (state.getPawn(a.rowTo + 2, a.columnTo)!!.equalsPawn("W")
                         || state.getPawn(a.rowTo + 2, a.columnTo)!!.equalsPawn("T")
                         || state.getPawn(a.rowTo + 2, a.columnTo)!!.equalsPawn("K"))
@@ -372,7 +372,7 @@ class GameModernTablut @JvmOverloads constructor(private val movesDraw: Int = 0)
         }
         // controllo se mangio sotto
         if (state != null) {
-            if (a.rowTo < state.board!!.size - 2 && (state!!.getPawn(a.rowTo + 1, a.columnTo)!!.equalsPawn("W")
+            if (a.rowTo < state.board!!.size - 2 && (state.getPawn(a.rowTo + 1, a.columnTo)!!.equalsPawn("W")
                         || state.getPawn(a.rowTo + 1, a.columnTo)!!.equalsPawn("K"))
                 && (state.getPawn(a.rowTo + 2, a.columnTo)!!.equalsPawn("B")
                         || state.getPawn(a.rowTo + 2, a.columnTo)!!.equalsPawn("T"))
@@ -418,7 +418,7 @@ class GameModernTablut @JvmOverloads constructor(private val movesDraw: Int = 0)
         if (state != null) {
             if (state.board!!.size == 9) {
                 if (a.columnTo == 4 && a.rowTo == 2) {
-                    if (state!!.getPawn(3, 4)!!.equalsPawn("W") && state.getPawn(4, 4)!!.equalsPawn("K")
+                    if (state.getPawn(3, 4)!!.equalsPawn("W") && state.getPawn(4, 4)!!.equalsPawn("K")
                         && state.getPawn(4, 3)!!.equalsPawn("B") && state.getPawn(4, 5)!!.equalsPawn("B")
                         && state.getPawn(5, 4)!!.equalsPawn("B")
                     ) {
@@ -429,7 +429,7 @@ class GameModernTablut @JvmOverloads constructor(private val movesDraw: Int = 0)
                     }
                 }
                 if (a.columnTo == 4 && a.rowTo == 6) {
-                    if (state!!.getPawn(5, 4)!!.equalsPawn("W") && state.getPawn(4, 4)!!.equalsPawn("K")
+                    if (state.getPawn(5, 4)!!.equalsPawn("W") && state.getPawn(4, 4)!!.equalsPawn("K")
                         && state.getPawn(4, 3)!!.equalsPawn("B") && state.getPawn(4, 5)!!.equalsPawn("B")
                         && state.getPawn(3, 4)!!.equalsPawn("B")
                     ) {
@@ -440,7 +440,7 @@ class GameModernTablut @JvmOverloads constructor(private val movesDraw: Int = 0)
                     }
                 }
                 if (a.columnTo == 2 && a.rowTo == 4) {
-                    if (state!!.getPawn(4, 3)!!.equalsPawn("W") && state.getPawn(4, 4)!!.equalsPawn("K")
+                    if (state.getPawn(4, 3)!!.equalsPawn("W") && state.getPawn(4, 4)!!.equalsPawn("K")
                         && state.getPawn(3, 4)!!.equalsPawn("B") && state.getPawn(5, 4)!!.equalsPawn("B")
                         && state.getPawn(4, 5)!!.equalsPawn("B")
                     ) {
@@ -451,7 +451,7 @@ class GameModernTablut @JvmOverloads constructor(private val movesDraw: Int = 0)
                     }
                 }
                 if (a.columnTo == 6 && a.rowTo == 4) {
-                    if (state!!.getPawn(4, 5)!!.equalsPawn("W") && state.getPawn(4, 4)!!.equalsPawn("K")
+                    if (state.getPawn(4, 5)!!.equalsPawn("W") && state.getPawn(4, 4)!!.equalsPawn("K")
                         && state.getPawn(4, 3)!!.equalsPawn("B") && state.getPawn(5, 4)!!.equalsPawn("B")
                         && state.getPawn(3, 4)!!.equalsPawn("B")
                     ) {

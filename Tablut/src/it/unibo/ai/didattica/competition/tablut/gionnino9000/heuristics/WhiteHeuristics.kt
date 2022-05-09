@@ -18,10 +18,9 @@ class WhiteHeuristics(state: State?) : Heuristics(state) {
     private val SAFE_PAWNS = 3
 
     // Weights for evaluation in the following order: WhiteAlive, BlackEaten, BestTiles, NumKingEscapes
-    private val gameWeights: Array<Double?>
+    private val gameWeights: Array<Double?> = arrayOfNulls(4)
 
     init {
-        gameWeights = arrayOfNulls(4)
         gameWeights[WHITE_ALIVE] = 35.0
         gameWeights[BLACK_EATEN] = 18.0
         gameWeights[KING_MOVEMENT] = 5.0
@@ -85,7 +84,7 @@ class WhiteHeuristics(state: State?) : Heuristics(state) {
             for (i in board!!.indices) {
                 for (j in board[i]!!.indices) {
                     if (board[i]!![j]!!.equalsPawn(Pawn.WHITE.toString())) {
-                        safe += if (canBeCaptured(state!!, intArrayOf(i, j), Pawn.WHITE)) 0 else 1
+                        safe += if (canBeCaptured(state, intArrayOf(i, j), Pawn.WHITE)) 0 else 1
                     }
                 }
             }

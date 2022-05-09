@@ -11,7 +11,7 @@ abstract class Background : JFrame() {
     protected var black: Image? = null
     protected var white: Image? = null
     protected var king: Image? = null
-    protected var aState: State? = null
+    private var aState: State? = null
 
     fun setaState(aState: State?) {
         this.aState = aState

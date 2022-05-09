@@ -19,7 +19,7 @@ class BlackHeuristics(state: State?) : Heuristics(state) {
     private val BLOCKED_ESC = 3
 
     // Weights for evaluation in the following order: WhiteEaten, BlackAlive, BlackSurroundingKing, RhombusPos
-    private val earlyGameWeights: Array<Double?>
+    private val earlyGameWeights: Array<Double?> = arrayOfNulls(4)
     private val lateGameWeights: Array<Double?>
 
     // Matrix of favourite black positions in the initial stages to block the escape ways
@@ -35,7 +35,6 @@ class BlackHeuristics(state: State?) : Heuristics(state) {
     )
 
     init {
-        earlyGameWeights = arrayOfNulls(4)
         earlyGameWeights[WHITE_EATEN] = 45.0
         earlyGameWeights[BLACK_ALIVE] = 35.0
         earlyGameWeights[BLACK_SUR_K] = 15.0
@@ -105,7 +104,7 @@ class BlackHeuristics(state: State?) : Heuristics(state) {
     /**
      * @return the number of black pawns on tiles if we have enough pawns
      */
-    val rhombusValue: Int
+    private val rhombusValue: Int
         get() = if (state!!.getNumberOf(Pawn.BLACK) >= 10) {
             pawnsInRhombus()
         } else {
@@ -115,7 +114,7 @@ class BlackHeuristics(state: State?) : Heuristics(state) {
     /**
      * @return the number of black pawns on rhombus configuration
      */
-    fun pawnsInRhombus(): Int {
+    private fun pawnsInRhombus(): Int {
         var count = 0
         for (position in rhombus) {
             if (state!!.getPawn(position[0], position[1])!!.equalsPawn(Pawn.BLACK.toString())) {
@@ -128,7 +127,7 @@ class BlackHeuristics(state: State?) : Heuristics(state) {
     /**
      * @return the number of pawns blocking king escape
      */
-    fun blockingPawns(): Int {
+    private fun blockingPawns(): Int {
         return 4 - Arrays.stream(getKingEscapes(state, kingPosition(state!!))).sum()
     }
 

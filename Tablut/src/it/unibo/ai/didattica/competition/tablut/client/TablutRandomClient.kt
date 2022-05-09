@@ -5,6 +5,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn
 import java.io.IOException
 import java.util.*
+import kotlin.system.exitProcess
 
 /**
  *
@@ -47,7 +48,7 @@ class TablutRandomClient @JvmOverloads constructor(
             }
             else -> {
                 println("Error in game selection")
-                System.exit(4)
+                exitProcess(4)
             }
         }
         val pawns: MutableList<IntArray> = ArrayList()
@@ -59,7 +60,7 @@ class TablutRandomClient @JvmOverloads constructor(
             } catch (e1: IOException) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace()
-                System.exit(1)
+                exitProcess(1)
             }
             println("Current state:")
             state = currentState
@@ -126,13 +127,13 @@ class TablutRandomClient @JvmOverloads constructor(
                     println("Waiting for your opponent move... ")
                 } else if (state?.turn == Turn.WHITEWIN) {
                     println("YOU WIN!")
-                    System.exit(0)
+                    exitProcess(0)
                 } else if (state?.turn == Turn.BLACKWIN) {
                     println("YOU LOSE!")
-                    System.exit(0)
+                    exitProcess(0)
                 } else if (state?.turn == Turn.DRAW) {
                     println("DRAW!")
-                    System.exit(0)
+                    exitProcess(0)
                 }
             } else {
 
@@ -187,13 +188,13 @@ class TablutRandomClient @JvmOverloads constructor(
                     println("Waiting for your opponent move... ")
                 } else if (state?.turn == Turn.WHITEWIN) {
                     println("YOU LOSE!")
-                    System.exit(0)
+                    exitProcess(0)
                 } else if (state?.turn == Turn.BLACKWIN) {
                     println("YOU WIN!")
-                    System.exit(0)
+                    exitProcess(0)
                 } else if (state?.turn == Turn.DRAW) {
                     println("DRAW!")
-                    System.exit(0)
+                    exitProcess(0)
                 }
             }
         }
@@ -209,9 +210,9 @@ class TablutRandomClient @JvmOverloads constructor(
             var ipAddress = "localhost"
             var timeout = 60
             // TODO: change the behavior?
-            if (args.size < 1) {
+            if (args.isEmpty()) {
                 println("You must specify which player you are (WHITE or BLACK)")
-                System.exit(-1)
+                exitProcess(-1)
             } else {
                 println(args[0])
                 role = args[0]

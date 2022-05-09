@@ -18,8 +18,7 @@ class AggiungiBianco(
     override fun actionPerformed(e: ActionEvent) {
         val casella = posizione.text
         posizione.text = ""
-        val a: Action
-        a = Action(casella, casella, Turn.WHITE)
+        val a: Action = Action(casella, casella, Turn.WHITE)
         val column = a.columnFrom
         val row = a.rowFrom
         state?.board?.get(row)?.set(column, Pawn.WHITE)

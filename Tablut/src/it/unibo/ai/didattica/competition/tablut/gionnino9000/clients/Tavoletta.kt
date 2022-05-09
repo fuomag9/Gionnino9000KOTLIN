@@ -6,6 +6,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Turn
 import it.unibo.ai.didattica.competition.tablut.gionnino9000.search.TavolettaSearch
 import java.io.IOException
 import java.util.*
+import kotlin.system.exitProcess
 
 /**
  * **Tavoletta** is the client of our player for the
@@ -21,32 +22,26 @@ import java.util.*
  * ([Federico Andrucci](https://github.com/Federicoand98), [Karina Chichifoi](https://github.com/TryKatChup),
  * [Alex Gianelli](https://github.com/Noesh), [Michele Righi](https://github.com/mikyll))
  */
-class Tavoletta : TablutClient {
-    private val game: Int
-    private val debug: Boolean
-
-    /**
-     * Main constructor
-     *
-     * @param player    the side the player plays for [WHITE | BLACK]
-     * @param name      the name of the team
-     * @param timeout   the maximum number of seconds the player has to choose its next move
-     * @param ipAddress the server address
-     * @param game      the game rules [1 - BasicTablut | 2 - ModernTablut | 3 - BrandubTablut | **4 - AshtonTablut**]
-     * @param debug     enable debug prints (show the depth of the search and information about the expanded nodes)
-     *
-     * @throws UnknownHostException if the IP address of the host could not be determined.
-     * @throws IOException if an I/O error occurs when creating the socket.
-     */
-    constructor(player: String, name: String, timeout: Int, ipAddress: String?, game: Int, debug: Boolean) : super(
+class Tavoletta
+/**
+ * Main constructor
+ *
+ * @param player    the side the player plays for [WHITE | BLACK]
+ * @param name      the name of the team
+ * @param timeout   the maximum number of seconds the player has to choose its next move
+ * @param ipAddress the server address
+ * @param game      the game rules [1 - BasicTablut | 2 - ModernTablut | 3 - BrandubTablut | **4 - AshtonTablut**]
+ * @param debug     enable debug prints (show the depth of the search and information about the expanded nodes)
+ *
+ * @throws UnknownHostException if the IP address of the host could not be determined.
+ * @throws IOException if an I/O error occurs when creating the socket.
+ */(player: String, name: String, timeout: Int, ipAddress: String?, private val game: Int, private val debug: Boolean) :
+    TablutClient(
         player,
         name,
         timeout,
         ipAddress
     ) {
-        this.game = game
-        this.debug = debug
-    }
 
     override fun run() {
         GOTavolettaDoTheMagicAndShine()
@@ -66,7 +61,7 @@ class Tavoletta : TablutClient {
                 read()
             } catch (e: IOException) {
                 e.printStackTrace()
-                System.exit(2)
+                exitProcess(2)
             }
 
             // Update the state received
@@ -91,14 +86,14 @@ class Tavoletta : TablutClient {
                 } else if (state.turn == Turn.WHITEWIN) {
                     // if WHITE win
                     println(TEAM_NAME.uppercase(Locale.getDefault()) + ": " + PLAYER_NAME + " dice \"abbiamo vinto! POG, dammi le mie spaccamascella! 🍬🍭\"")
-                    System.exit(0)
+                    exitProcess(0)
                 } else if (state.turn == Turn.BLACKWIN) {
                     // if BLACK win
                     println(TEAM_NAME.uppercase(Locale.getDefault()) + ": " + PLAYER_NAME + " dice \"abbiamo perso... Kinda sus, mi sa che qualcuno qui ha barato...\"")
-                    System.exit(0)
+                    exitProcess(0)
                 } else if (state.turn == Turn.DRAW) {
                     println(TEAM_NAME.uppercase(Locale.getDefault()) + ": " + PLAYER_NAME + " dice \"pareggio, onesto.\"")
-                    System.exit(0)
+                    exitProcess(0)
                 }
             } else {
                 if (state.turn == Turn.BLACK) {
@@ -116,14 +111,14 @@ class Tavoletta : TablutClient {
                 } else if (state.turn == Turn.BLACKWIN) {
                     // if WHITE win
                     println(TEAM_NAME.uppercase(Locale.getDefault()) + ": " + PLAYER_NAME + " dice \"abbiamo vinto! POG, dammi le mie spaccamascella! 🍬🍭\"")
-                    System.exit(0)
+                    exitProcess(0)
                 } else if (state.turn == Turn.WHITEWIN) {
                     // if BLACK win
                     println(TEAM_NAME.uppercase(Locale.getDefault()) + ": " + PLAYER_NAME + " dice \"abbiamo perso... Kinda sus, mi sa che qualcuno qui ha barato...\"")
-                    System.exit(0)
+                    exitProcess(0)
                 } else if (state.turn == Turn.DRAW) {
                     println(TEAM_NAME.uppercase(Locale.getDefault()) + ": " + PLAYER_NAME + " dice \"pareggio, onesto.\"")
-                    System.exit(0)
+                    exitProcess(0)
                 }
             }
         }
@@ -146,9 +141,9 @@ class Tavoletta : TablutClient {
             var ip = "localhost"
             var timeout = 60
             var deb = false
-            if (args.size < 1) {
+            if (args.isEmpty()) {
                 //print(/* !!! Hit visitElement for element type: class org.jetbrains.kotlin.nj2k.tree.JKErrorExpression !!! */)
-                System.exit(1)
+                exitProcess(1)
             } else {
                 role = args[0]
             }
@@ -158,7 +153,7 @@ class Tavoletta : TablutClient {
                 } catch (e: NumberFormatException) {
                     e.printStackTrace()
                     //print(/* !!! Hit visitElement for element type: class org.jetbrains.kotlin.nj2k.tree.JKErrorExpression !!! */)
-                    System.exit(1)
+                    exitProcess(1)
                 }
             }
             if (args.size == 3) {
@@ -168,7 +163,7 @@ class Tavoletta : TablutClient {
                 } catch (e: NumberFormatException) {
                     e.printStackTrace()
                     //print(/* !!! Hit visitElement for element type: class org.jetbrains.kotlin.nj2k.tree.JKErrorExpression !!! */)
-                    System.exit(1)
+                    exitProcess(1)
                 }
             }
             if (args.size == 4) {
@@ -178,7 +173,7 @@ class Tavoletta : TablutClient {
                 } catch (e: NumberFormatException) {
                     e.printStackTrace()
                     //print(/* !!! Hit visitElement for element type: class org.jetbrains.kotlin.nj2k.tree.JKErrorExpression !!! */)
-                    System.exit(1)
+                    exitProcess(1)
                 }
                 if (args[3] == "debug") {
                     deb = true
@@ -187,7 +182,7 @@ class Tavoletta : TablutClient {
                         """ERROR: The last argument can be only 'debug' and it allow to print logs during search
 	USAGE: ./runmyplayer <black|white> <timeout-in-seconds> <server-ip> <debug>"""
                     )
-                    System.exit(1)
+                    exitProcess(1)
                 }
             }
             println("Team Gionnino9000\n\nMembers:\n\tFederico Andrucci\n\tKarina Chichifoi\n\tAlex Gianelli\n\tMichele Righi\n")
@@ -195,7 +190,7 @@ class Tavoletta : TablutClient {
             println("Timeout: $timeout secondi")
             println("Server:  $ip")
             println("Debug:   $deb\n")
-            val client = Tavoletta(role, PLAYER_NAME + " (Team " + TEAM_NAME + ")", timeout, ip, gameType, deb)
+            val client = Tavoletta(role, "$PLAYER_NAME (Team $TEAM_NAME)", timeout, ip, gameType, deb)
             client.run()
         }
 

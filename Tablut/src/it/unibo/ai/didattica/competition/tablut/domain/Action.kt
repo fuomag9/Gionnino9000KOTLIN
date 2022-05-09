@@ -26,7 +26,7 @@ class Action(from: String?, to: String?, t: Turn?) : Serializable {
     }
 
     override fun toString(): String {
-        return "Turn: " + turn + " " + "Pawn from " + from + " to " + to
+        return "Turn: $turn Pawn from $from to $to"
     }
 
     /**
